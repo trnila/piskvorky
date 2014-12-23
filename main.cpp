@@ -16,20 +16,191 @@ SDL_Texture* loadAsTexture(SDL_Renderer *renderer, const char *file) {
 	return texture;
 }
 
-struct M {
-	char symbol;
+enum class CellType {Empty, Cross, Circle};
+
+enum class WinType {None, Vertical, Horizontal, MainDiagonal, MinorDiagonal};
+
+struct Win {
+	CellType symbol;
 	int count;
+	int startRow, startCol;
+	WinType type;
 	
-	M() {
-		symbol = ' ';
+	Win() {
+		symbol = CellType::Empty;
 		count = 0;
 	}
+};
+
+class Game {
+public:	
+	Game(int count, int minRequired) {
+		this->count = count;
+		this->minRequired = minRequired;
+		nextType = CellType::Circle;
+		
+		cells = new CellType*[count];
+		for(int row = 0; row < count; row++) {
+			cells[row] = new CellType[count];
+		}
+		
+		reset();
+	};
+	
+	~Game() {
+		for(int row = 0; row < count; row++) {
+			delete[] cells[row];
+		}
+		delete[] cells;
+	}
+	
+	void reset() {
+		win = Win();
+		
+		for(int row = 0; row < count; row++) {
+			for(int col = 0; col < count; col++) {
+				cells[row][col] = CellType::Empty;
+			}
+		}
+	}
+	
+	bool step(int row, int col) {
+		if(get(row, col) == CellType::Empty) {
+			cells[row][col] = nextType;
+			
+			nextType = nextType == CellType::Circle ? CellType::Cross : CellType::Circle;
+			
+			check();
+			
+			return true;
+		}
+		return false;
+	}
+	
+	CellType get(int row, int col) {
+		return cells[row][col];
+	}
+	
+	int getCount() {
+		return count;
+	}
+	
+	int setMinRequired(int minRequired) {
+		this->minRequired = minRequired;
+	}
+	
+	bool isWin() {
+		return win.symbol != CellType::Empty;
+	}
+	
+	Win getWin() {
+		return win;
+	}
+	
+protected:
+	bool check() {
+		// check horizontal and vertical
+		for(int row = 0; row < getCount(); row++) {
+			Win vertical;
+			vertical.type = WinType::Vertical;
+			
+			Win horizontal;
+			horizontal.type = WinType::Horizontal;			
+			
+			for(int col = 0; col < getCount(); col++) {
+				if(checkCell(row, col, vertical)) {
+					win = vertical;
+					return true;
+				}
+				
+				if(checkCell(col, row, horizontal)) {
+					win = horizontal;
+					return true;
+				}	
+			}
+		}
+		
+		// check diagonals
+		int start = ceil(minRequired / sqrt(2));
+		for(int i = start; i <= count; i++) {
+			Win main1, main2, minor1, minor2;
+			main1.type = main2.type = WinType::MainDiagonal;
+			minor1.type = minor2.type = WinType::MinorDiagonal;
+			
+			for(int member = 0; member < i; member++) {
+				int y = member;
+				
+				// main diagonal
+				int x = count - i + member;
+				if(checkCell(x, y, main1)) {
+					win = main1;
+					return true;
+				}
+				
+				if(x != y && checkCell(y, x, main2)) {
+					win = main2;
+					return true;
+				}
+				
+				// check minor diagonal
+				x = i - member - 1;
+				if(checkCell(x, y, minor1)) {
+					win = minor1;
+					return true;
+				}
+				
+				x = count - member - 1;
+				y = count - i + member;
+				if(checkCell(x, y, minor2)) {
+					win = minor2;
+					return true;
+				}
+			}			
+		}
+				
+		return false;
+	}
+	
+	bool checkCell(int x, int y, Win &record) {
+		if(cells[x][y] == CellType::Empty) {
+			record.count = 0;
+		} else if(cells[x][y] == record.symbol) {
+			record.count++;
+					
+			if(record.count >= minRequired) {
+				return true;
+			}
+		} else {
+			record.symbol = cells[x][y];
+			record.count = 1;
+			record.startRow = x;
+			record.startCol = y;
+		}
+		
+		return false;
+	}
+	
+private:
+	/* count of rows/cols */
+	int count;
+	
+	/* table of cells */
+	CellType **cells;
+	
+	/* CellType in next step */
+	CellType nextType;
+	
+	/* count of connected cells for win */
+	int minRequired;
+	
+	/* How somebody win */
+	Win win;
 };
 
 int main(int argc, char** argv) {
 	Root root;
 	root.width = 800;
-	root.height = 600;
+	root.height = 800;
 	
 	srand(time(NULL));
 
@@ -77,23 +248,6 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	
-	SDL_Cursor *hand = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-	SDL_Cursor *arrow = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-	
-	
-	SDL_Event evt;
-	bool quit = false;
-	const int cells = 20;
-	int cellSize = root.width / cells;
-	char grid[cells][cells];
-	for(int row = 0; row < cells; row++) {
-		for(int col = 0; col < cells; col++) {
-			grid[row][col] = ' ';
-		}
-	}
-	
-	
-	
 	SDL_Texture *cross = loadAsTexture(root.renderer, "cross.png");
 	SDL_Texture *circle = loadAsTexture(root.renderer, "circle.png");
 	if(cross == NULL || circle == NULL) {
@@ -101,103 +255,97 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	
-	bool nextCircle = true;
-	
+		
+	Game game(8, 3);
+	int cellSize = root.width / game.getCount();
+			
+	SDL_Event evt;
+	bool quit = false;
 	while(!quit) {
+		SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
+		SDL_RenderClear(root.renderer);
+		
 		while(SDL_PollEvent(&evt)) {
 			if(evt.type == SDL_MOUSEBUTTONDOWN) {
 				int row = evt.motion.x / cellSize;
 				int col = evt.motion.y / cellSize;
 				
-				if(grid[row][col] == ' ') {
-					grid[row][col] = nextCircle ? 'O' : 'X';
-				
-					nextCircle = !nextCircle;
-				}
-				
+				game.step(row, col);
 			} else if(evt.type == SDL_QUIT) {
 				quit = true;
 				break;
 			}
 		}
 		
-		SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
-		SDL_RenderClear(root.renderer);
 		
 		
-		for(int i = 0; i < cells; i++) {
+		
+		for(int i = 0; i < game.getCount(); i++) {
 			SDL_SetRenderDrawColor(root.renderer, 0, 0, 0, 255);
 			SDL_RenderDrawLine(root.renderer, 0, cellSize * i, root.width, cellSize * i); 
 			SDL_RenderDrawLine(root.renderer, cellSize * i, 0, cellSize*i, root.height);
 		}
 		
-		for(int row = 0; row < cells; row++) {
-			for(int col = 0; col < cells; col++) {
+		for(int row = 0; row < game.getCount(); row++) {
+			for(int col = 0; col < game.getCount(); col++) {
 				SDL_Rect rect;
 				rect.w = rect.h = cellSize;
 				rect.x = row * cellSize;
 				rect.y = col * cellSize;
 				
-				if(grid[row][col] == 'O') {
+				if(game.get(row, col) == CellType::Circle) {
 					SDL_RenderCopy(root.renderer, circle, NULL, &rect);
-				} else if(grid[row][col] == 'X') {
+				} else if(game.get(row, col) == CellType::Cross) {
 					SDL_RenderCopy(root.renderer, cross, NULL, &rect);
 				}
 			}
 		}
 		
-		char win = ' ';
-		const int minRequired = 3;
-		
-		// vertical check
-		for(int row = 0; row < cells; row++) {
-			M vertical;
-			for(int col = 0; col < cells; col++) {
-				if(grid[row][col] == ' ') {
-					vertical.count = 0;
-				} else if(grid[row][col] == vertical.symbol) {
-					vertical.count++;
-					
-					if(vertical.count >= minRequired) {
-						win = vertical.symbol;
-					}
-				} else {
-					vertical.symbol = grid[row][col];
-					vertical.count = 1;
-				}
+		if(game.isWin()) {
+			Win win = game.getWin();
+			
+			SDL_Point start;
+			start.x = win.startRow * cellSize;
+			start.y = win.startCol * cellSize;
+			
+			SDL_Point end = start;
+			if(win.type == WinType::Vertical) {
+				end.x = start.x += cellSize / 2;
+				end.y += cellSize * win.count;
+			} else if(win.type == WinType::Horizontal) {
+				end.y = start.y += cellSize / 2;
+				end.x += cellSize * win.count;
+			} else if(win.type == WinType::MainDiagonal) {
+				end.x += cellSize * win.count;
+				end.y += cellSize * win.count;
+			} else if(win.type == WinType::MinorDiagonal) {
+				start.x += cellSize;
+				
+				end.x -= cellSize * (win.count - 1);
+				end.y += cellSize * win.count;
+				//end.x = end.y = 0;
 			}
-		}
-		
-		// horizontal
-		for(int col = 0; col < cells; col++) {
-			M vertical;
-			for(int row = 0; row < cells; row++) {
-				if(grid[row][col] == ' ') {
-					vertical.count = 0;
-				} else if(grid[row][col] == vertical.symbol) {
-					vertical.count++;
-					
-					if(vertical.count >= minRequired) {
-						win = vertical.symbol;
-					}
-				} else {
-					vertical.symbol = grid[row][col];
-					vertical.count = 1;
-				}
-			}
-		}
-		
-		if(win != ' ') {
-			if(win == 'X') {
+			
+			SDL_SetRenderDrawColor(root.renderer, 0, 0, 0, 255);
+			SDL_RenderDrawLine(
+				root.renderer,
+				start.x,
+				start.y,
+				end.x,
+				end.y				
+			);
+			
+			if(win.symbol == CellType::Cross) {
 				SDL_RenderCopy(root.renderer, cross, NULL, NULL);
-			} else if(win == 'O') {
+			} else if(win.symbol == CellType::Circle) {
 				SDL_RenderCopy(root.renderer, circle, NULL, NULL);
 			}
 			
 			SDL_RenderPresent(root.renderer);
 			
-			SDL_Delay(5000);
-			break;
+			SDL_Delay(1000);
+			
+			game.reset();
 		}
 		
 		
