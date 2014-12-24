@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL/SDL_events.h>
 #include "Gfx.h"
 #include "Root.h"
 
@@ -197,6 +198,62 @@ private:
 	Win win;
 };
 
+bool match(int x, int y, SDL_Rect &rect) {
+	return x > rect.x && x < (rect.x + rect.w) && y > rect.y && y < (rect.y + rect.h);
+}
+
+void mainMenu(Root *root, Font *font) {
+	bool quit = false;
+	SDL_Event evt;
+	
+	/*TBox header(&root, font, (SDL_Rect) {100, 100, 400, 100});
+	header.print("piskvorky");
+	header.setColor({0, 0, 0});*/
+	
+	Container container(root);
+	
+	Text header(root, font, TextType::Variable);
+	header.setText("piskvorky");
+	header.setPosition({100, 100});
+	header.setColor({0, 0, 0});
+	
+	Text newGame(root, font, TextType::Variable);
+	newGame.setText("new game");
+	newGame.setPosition({100, 200});
+	newGame.setColor({0, 0, 255});
+	//newGame.setFontSize(18);
+	
+	Input i(root, font, {400, 400, 100, 100});
+	
+	container.addComponent(&header);
+	container.addComponent(&newGame);
+	container.addComponent(&i);
+	
+	newGame.onClick.push_back([&]() ->  void {
+		quit = true;
+	});
+	
+	while(!quit) {
+		while(SDL_PollEvent(&evt)) {
+			if(evt.type == SDL_QUIT) {
+				quit = true;
+				exit(1);
+				break;
+			}
+			
+			container.injectEvent(&evt);
+		}
+		
+		SDL_SetRenderDrawColor(root->renderer, 255, 255, 255, 255);
+		SDL_RenderClear(root->renderer);
+		
+		container.render();
+
+		
+		SDL_RenderPresent(root->renderer);
+	}
+}
+
 int main(int argc, char** argv) {
 	Root root;
 	root.width = 800;
@@ -255,8 +312,12 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	
+	Font f(&root, font);
+	
+	mainMenu(&root, &f);
+	
 		
-	Game game(8, 3);
+	Game game(20, 4);
 	int cellSize = root.width / game.getCount();
 			
 	SDL_Event evt;

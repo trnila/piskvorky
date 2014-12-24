@@ -1,9 +1,12 @@
 #include "Gfx.h"
 
-Font::Font(Root *root, TTF_Font *font):Component(root) {
-		this->font = font;
-		this->maxWidth = 0;
-	}
+Font::Font(Root *root, TTF_Font *font) {
+	this->font = font;
+	this->maxWidth = 0;
+	this->root = root;
+	
+	build();
+}
 	
 Font::~Font() {
 	SDL_DestroyTexture(texture);
@@ -56,61 +59,67 @@ void Font::build() {
 }
 
 
-void Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &color) {		
+SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &color, int fontSize) {		
 	SDL_Rect src, dst;		
 
-	dst.h = height;
+	dst.h = fontSize > 0 ? fontSize : height;
 	dst.x = rect.x;
 	dst.y = rect.y;
 
 	src.h = height;
 	src.w = maxWidth;
 	
+	SDL_Rect result;
+	result.x = rect.x;
+	result.y = rect.y;
+	result.h = dst.h;
+	result.w = 0;
+	
+	int w = 0;
+	
 	SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
 
 	for(int i = 0; msg[i] != '\0'; i++) {
 		// put newline if overflows or newline character
-		if(msg[i] == '\n' || dst.x + widths[msg[i] - ' '] > rect.x + rect.w) {
+		if(msg[i] == '\n' || (rect.w != 0 && dst.x + widths[msg[i] - ' '] > rect.x + rect.w)) {
 			dst.y += height;
 			dst.x = rect.x;
+			
+			result.h += dst.h;
+			
+			if(w > result.w) {
+				result.w = w;
+			}
+			w = 0;
 		}
 
 		// dont render more chars when overflows y
-		if(dst.y + height >= rect.y + rect.h) {
+		if(rect.h != 0 && dst.y + height >= rect.y + rect.h) {
 			break;
 		}
 
 
-
+		widths[0] = 20;
 		if(msg[i] >= ' ' && msg[i] <= '~') {
 			src.x = maxWidth * (msg[i] - ' ');
 			src.y = 0;
 
 			dst.w = maxWidth;
+			w += widths[msg[i] - ' '];
 
 			SDL_RenderCopy(root->renderer, texture, &src, &dst);
 
 			dst.x += widths[msg[i] - ' '];				
 		}
 	}
-}
-
-
-TBox::TBox(Root *root, Font *font, SDL_Rect rect):Component(root) {
-	this->font = font;
-	this->rect = rect;
-	this->color = {255, 255, 255};
-	this->background = {250, 0, 0, 0};
-}
-
-void TBox::print(const char *msg) {
-	buffer += msg;
-}
-
-void TBox::render() {
-	//SDL_SetRenderDrawBlendMode(root->renderer, SDL_BLENDMODE_BLEND);
-	//SDL_SetRenderDrawColor(root->renderer, background.r, background.g, background.b, 0);
-	//SDL_RenderFillRect(root->renderer, &rect);
-
-	font->write(buffer.c_str(), rect, color);
+	
+	if(w > result.w) {
+		result.w = w;
+	}
+	
+	/*SDL_SetRenderDrawBlendMode(root->renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(root->renderer, 0, 255, 0, 125);
+	SDL_RenderFillRect(root->renderer, &result);
+	*/
+	return result;
 }
