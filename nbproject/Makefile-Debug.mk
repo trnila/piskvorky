@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/Game.o \
 	${OBJECTDIR}/Gfx.o \
 	${OBJECTDIR}/Root.o \
 	${OBJECTDIR}/main.o
@@ -63,6 +64,11 @@ LDLIBSOPTIONS=`pkg-config --libs SDL2_ttf` `pkg-config --libs sdl2` `pkg-config 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/piskvorky: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/piskvorky ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/Game.o: Game.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g `pkg-config --cflags SDL2_ttf` `pkg-config --cflags sdl2` `pkg-config --cflags SDL2_image` -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Game.o Game.cpp
 
 ${OBJECTDIR}/Gfx.o: Gfx.cpp 
 	${MKDIR} -p ${OBJECTDIR}
