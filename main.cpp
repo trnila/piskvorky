@@ -132,12 +132,15 @@ int main(int argc, char** argv) {
 	
 	mainMenu(&root, &f);
 	
+	SDL_ShowCursor(0);
+	
 		
 	Game game(20, 4);
 	int cellSize = root.width / game.getCount();
 			
 	SDL_Event evt;
 	bool quit = false;
+	SDL_Point mouse;
 	while(!quit) {
 		SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
 		SDL_RenderClear(root.renderer);
@@ -151,18 +154,20 @@ int main(int argc, char** argv) {
 			} else if(evt.type == SDL_QUIT) {
 				quit = true;
 				break;
+			} else if(evt.type == SDL_MOUSEMOTION) {
+				mouse.x = evt.motion.x;
+				mouse.y = evt.motion.y;
 			}
 		}
 		
-		
-		
-		
+		// redraw lines
 		for(int i = 0; i < game.getCount(); i++) {
 			SDL_SetRenderDrawColor(root.renderer, 0, 0, 0, 255);
 			SDL_RenderDrawLine(root.renderer, 0, cellSize * i, root.width, cellSize * i); 
 			SDL_RenderDrawLine(root.renderer, cellSize * i, 0, cellSize*i, root.height);
 		}
 		
+		// draw circles, crosses
 		for(int row = 0; row < game.getCount(); row++) {
 			for(int col = 0; col < game.getCount(); col++) {
 				SDL_Rect rect;
@@ -225,6 +230,8 @@ int main(int argc, char** argv) {
 			game.reset();
 		}
 		
+		SDL_Rect r = {mouse.x - 10, mouse.y - 10, 20, 20};
+		SDL_RenderCopy(root.renderer, game.getNextType() == CellType::Cross ? cross : circle, NULL, &r);
 		
 		SDL_RenderPresent(root.renderer);
 	}

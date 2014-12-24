@@ -26,6 +26,7 @@ public:
 	int setMinRequired(int minRequired);	
 	bool isWin();	
 	Win getWin();
+	CellType getNextType();
 	
 protected:
 	bool check();	

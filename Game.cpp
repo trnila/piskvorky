@@ -69,6 +69,10 @@ Win Game::getWin() {
 	return win;
 }
 
+CellType Game::getNextType() {
+	return nextType;
+}
+
 bool Game::check() {
 	// check horizontal and vertical
 	for(int row = 0; row < getCount(); row++) {
