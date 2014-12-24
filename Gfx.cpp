@@ -1,4 +1,5 @@
 #include "Gfx.h"
+#include "math.h"
 
 Font::Font(Root *root, TTF_Font *font) {
 	this->font = font;
@@ -13,8 +14,7 @@ Font::~Font() {
 }
 	
 void Font::build() {
-	height = TTF_FontHeight(font);
-
+        height = ceil(('~' - ' ') / 8.0) * TTF_FontHeight(font);
 	// find font max width
 	for(char c = ' '; c <= '~'; c++) {
 		int minx, maxx;
@@ -28,7 +28,7 @@ void Font::build() {
 		}
 	}
 
-	SDL_Surface *surf = SDL_CreateRGBSurface(0, maxWidth * ('~' - ' '), 100, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+	SDL_Surface *surf = SDL_CreateRGBSurface(0, maxWidth * 8, height, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
 	SDL_Rect dst;
 	dst.x = 0;
@@ -36,7 +36,18 @@ void Font::build() {
 	dst.w = maxWidth;
 	dst.h = height;
 
+
+        
+        
 	for(char c = ' '; c <= '~'; c++) {
+                
+                if((c-' ')%8==0 and c != ' '){ //dirty hack :D
+                    std::cout << (0)%8 << "ENDL"<<std::endl;
+                    dst.x=0;
+                    dst.y+=TTF_FontHeight(font);
+                    
+                }
+
 		SDL_Surface *letter = TTF_RenderGlyph_Blended(font, c, {255,255,255});
 		if(letter) {
 			SDL_BlitSurface(letter, NULL, surf, &dst);
@@ -44,6 +55,7 @@ void Font::build() {
 		}
 
 		dst.x += maxWidth;
+
 	}
 
 	SDL_SaveBMP(surf, "/tmp/a.bmp");
