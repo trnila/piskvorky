@@ -90,6 +90,13 @@ protected:
 class Container : public Component {
 public:
 	Container(Root &root): Component(root) {}
+	~Container() {
+		for(Component* component : components) {
+			delete component;
+		}
+	}
+	
+	
 	void addComponent(Component *component) {
 		components.push_back(component);
 	}

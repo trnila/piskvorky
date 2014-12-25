@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL/SDL_events.h>
+#include <SDL/SDL_image.h>
 #include "Gfx.h"
 #include "Root.h"
 #include "Game.h"
@@ -105,7 +106,7 @@ public:
 		container.addComponent(quitBtn);
 		container.addComponent(i);		
 	}
-	
+		
 	void renderOneFrame() {
 		SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
 		SDL_RenderClear(root.renderer);
@@ -136,6 +137,11 @@ public:
 		}
 
 		cellSize = root.width / game.getCount();
+	}
+	
+	~PiskvorkyState() {
+		SDL_DestroyTexture(cross);
+		SDL_DestroyTexture(circle);
 	}
 	
 	void init() {
@@ -308,14 +314,13 @@ int main(int argc, char** argv) {
 	
 	
 	Font f(&root, font);
-	
-	
+		
 	MainMenuState mainMenu(root, f);
 	PiskvorkyState gameScene(root);
 	
 	SDL_Event evt;
 	
-	
+		
 	GameStateType nextState = GameStateType::MainMenu;
 	while(nextState != GameStateType::Quit) {
 		GameState *state;
@@ -349,8 +354,10 @@ int main(int argc, char** argv) {
 		
 		state->deinit();
 	}
-	
-	
+		
+	TTF_Quit();
+	IMG_Quit();
+	SDL_Quit();
 	
 	return 0;
 }
