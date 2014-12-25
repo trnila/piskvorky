@@ -12,10 +12,7 @@
 
 class Component {
 public:
-	Component(Root *root) {
-		this->root = root;
-		visible = true;
-	}
+	Component(Root &root): root(root), visible(true), mousedIn(false), focused(false) {}
 	
 	bool isVisible() {
 		return visible;
@@ -25,45 +22,74 @@ public:
 		this->visible = visible;
 	}	
 	
-	SDL_Rect getRect() {
+	const SDL_Rect& getRect() {
 		return rect;
 	}
 	
 	virtual void render() = 0;
 	
-	void injectEvent(SDL_Event *evt) {
-		 if(evt->type == SDL_MOUSEMOTION) {
-			mouseMoveIn(evt);
-		} else if(evt->type == SDL_MOUSEBUTTONDOWN) {
-			mouseClick(evt);
-		} else if(evt->type ==  SDL_TEXTINPUT) {
-			textInput(evt);
-		} else if(evt->type == SDL_KEYDOWN) {
-			keyDown(evt);
+	void injectEvent(const SDL_Event &evt) {
+		if(evt.type == SDL_MOUSEMOTION) {
+			 if(match(evt.motion.x, evt.motion.y, rect)) {
+				for(auto fn : onMouseMoveIn) {
+					fn();
+				}
+				
+				mousedIn = true;
+			 } else if(mousedIn) {
+				for(auto fn : onMouseMoveOut) {
+					fn();
+				}
+				
+				mousedIn = false;
+			 }
+		} else if(evt.type == SDL_MOUSEBUTTONDOWN) {
+			if(match(evt.motion.x, evt.motion.y, rect)) {
+				for(auto fn : onClick) {
+					fn();
+				}
+				focused = true;
+			} else if(focused) {
+				for(auto fn : onBlur) {
+					fn();
+				}
+				
+				focused = false;
+			}
+		} else if(evt.type ==  SDL_TEXTINPUT) {
+			for(auto fn : onTextInput) {
+				fn(evt);
+			}
+		} else if(evt.type == SDL_KEYDOWN) {
+			for(auto fn : onKeyDown) {
+				fn(evt);
+			}
 		}
 	}
-	
-	virtual bool mouseMoveIn(SDL_Event *evt) {}
-	virtual bool mouseMoveOut(SDL_Event *evt) {}
-	virtual bool mouseClick(SDL_Event *evt) {}
-	virtual bool focusOut(SDL_Event *evt) {}
-	
-	virtual bool textInput(SDL_Event *evt) {}
-	virtual bool keyDown(SDL_Event *evt) {}
-	
+		
 	std::vector<std::function<void()>> onClick;
-	
+	std::vector<std::function<void()>> onMouseMoveIn;
+	std::vector<std::function<void()>> onMouseMoveOut;
+	std::vector<std::function<void()>> onBlur;
+	std::vector<std::function<void(const SDL_Event &evt)>> onKeyDown;
+	std::vector<std::function<void(const SDL_Event &evt)>> onTextInput;
+		
 protected:
-	Root *root;
+	Root &root;
 	bool visible;
 	SDL_Rect rect;
 	
+	bool mousedIn;
+	bool focused;
 	
+	bool match(int x, int y, SDL_Rect rect) {
+		return x > rect.x && x < (rect.x + rect.w) && y > rect.y && y < (rect.y + rect.h);
+	}	
 };
 
 class Container : public Component {
 public:
-	Container(Root *root): Component(root) {}
+	Container(Root &root): Component(root) {}
 	void addComponent(Component *component) {
 		components.push_back(component);
 	}
@@ -76,50 +102,15 @@ public:
 		}
 	}
 	
-	bool mouseMoveIn(SDL_Event *evt) {
-		while(!mousedIn.empty()) {
-			mousedIn.top()->mouseMoveOut(evt);
-			mousedIn.pop();
-		}
-				
-		for(Component* component : components) {
-			if(match(evt->motion.x, evt->motion.y, component->getRect())) {
-				component->mouseMoveIn(evt);
-				
-				mousedIn.push(component);
-			}
-		}		
-	}
-	
-	bool mouseClick(SDL_Event *evt) {
-		for(Component* component : components) {
-			if(match(evt->motion.x, evt->motion.y, component->getRect())) {
-				component->mouseClick(evt);
-			} else {
-				component->focusOut(evt);
-			}
+	void injectEvent(const SDL_Event &evt) {
+		for(Component* child: components) {
+			child->injectEvent(evt);
 		}
 	}
-	
-	bool textInput(SDL_Event *evt) {
-		for(Component* component : components) {
-			component->textInput(evt);
-		}
-	}
-	
-	bool keyDown(SDL_Event *evt) {
-		for(Component* component : components) {
-			component->keyDown(evt);
-		}
-	}
-	
+		
 private:
 	std::vector<Component*> components;
 	std::stack<Component*> mousedIn;
-	
-	bool match(int x, int y, SDL_Rect rect) {
-		return x > rect.x && x < (rect.x + rect.w) && y > rect.y && y < (rect.y + rect.h);
-	}
 };
 
 class Font {
@@ -131,8 +122,8 @@ private:
 	/* font height */
 	int height;
         
-        /* temp bitmap height */
-        int bitmapHeight;
+	/* temp bitmap height */
+	int bitmapHeight;
 
 	/* Spacing between letters */
 	int spacing;
@@ -148,7 +139,6 @@ public:
 	
 	void build();
 	SDL_Rect write(const char*, const SDL_Rect& rect, const SDL_Color &color, int fontSize = 0);
-	
 };
 
 enum class TextType {Variable, Fixed};
@@ -156,11 +146,11 @@ enum class TextType {Variable, Fixed};
 
 class Text: public Component {
 public:
-	Text(Root *root, Font *font, TextType type):Component(root) {
+	Text(Root &root, Font *font, TextType type): Component(root) {
 		this->font = font;
 		fontSize = 0;
 		
-		maxRect = rect = {0, 0, 0, 0};		
+		maxRect = rect = {0, 0, 0, 0};
 		textType = type;
 	}
 	
@@ -193,23 +183,6 @@ public:
 		rect = font->write(text.c_str(), maxRect, color, fontSize);
 	}
 	
-	virtual bool mouseMoveIn(SDL_Event *evt) {
-		setColor({255, 0, 0});
-	}
-	
-	virtual bool mouseMoveOut(SDL_Event *evt) {
-		setColor({0, 0, 0});
-	}
-	
-	virtual bool mouseClick(SDL_Event *evt) {
-		setColor({0, 255, 0});
-		
-		for(auto &fn : onClick) {
-			fn();
-		}
-	}
-	
-	
 private:
 	Font *font;
 	std::string text;
@@ -222,7 +195,7 @@ private:
 
 class Input: public Component {
 public:
-	Input(Root* root, Font *font, SDL_Rect rect): Component(root) {
+	Input(Root& root, Font *font, SDL_Rect rect): Component(root) {
 		this->rect = rect;
 		
 		editing = false;
@@ -234,6 +207,40 @@ public:
 		text->setRect(rect);
 		text->setColor({255, 0, 0});
 		text->setText("Daniel");
+		
+		onMouseMoveIn.push_back([&]() -> void {
+			root.setTextCursor();
+		});
+		
+		onMouseMoveOut.push_back([&]() -> void {
+			root.setDefaultCursor();			
+		});
+		
+		onClick.push_back([&]() -> void {
+			editing = true;
+			SDL_StartTextInput();
+		});
+		
+		onBlur.push_back([&]() -> void {
+			editing = false;
+			SDL_StopTextInput();
+		});
+		
+		onKeyDown.push_back([&](const SDL_Event &evt) -> void {
+			if(editing) {
+				if(evt.key.keysym.sym == SDLK_BACKSPACE) {
+					if(text->getText().length() > 0) {
+						text->getText().pop_back();
+					}
+				}	
+			}
+		});
+		
+		onTextInput.push_back([&](const SDL_Event &evt) {
+			if(editing) {
+				text->getText().append(evt.edit.text);
+			}
+		});
 	}
 	
 	~Input() {
@@ -241,8 +248,8 @@ public:
 	}
 	
 	void render() {
-		SDL_SetRenderDrawColor(root->renderer, 255, 0, 0, 0);
-		SDL_RenderDrawRect(root->renderer, &rect);
+		SDL_SetRenderDrawColor(root.renderer, 255, 0, 0, 0);
+		SDL_RenderDrawRect(root.renderer, &rect);
 		
 		text->render();
 		
@@ -255,7 +262,7 @@ public:
 			if(blink) {
 				SDL_Rect r = text->getRect();
 				SDL_RenderDrawLine(
-					root->renderer, 
+					root.renderer, 
 					r.x + r.w + 10,
 					r.y,
 					r.x + r.w + 10,
@@ -265,47 +272,12 @@ public:
 		}
 	}
 	
-	virtual bool mouseClick(SDL_Event* evt) {
-		if(!editing) {
-			SDL_StartTextInput();
-		}
-		
-		editing = true;
-	}
-	
-	virtual bool focusOut(SDL_Event *evt) {
-		SDL_StopTextInput();
-		editing = false;
-	}
-
-	virtual bool textInput(SDL_Event* evt) {
-		text->getText().append(evt->edit.text);
-	}
-	
-	virtual bool keyDown(SDL_Event *evt) {
-		if(evt->key.keysym.sym == SDLK_BACKSPACE) {
-			if(text->getText().length() > 0) {
-				text->getText().pop_back();
-			}
-		}
-	}
-	
-	virtual bool mouseMoveIn(SDL_Event *evt) {
-		root->setTextCursor();
-	}
-	
-	virtual bool mouseMoveOut(SDL_Event *evt) {
-		root->setDefaultCursor();
-	}
-	
 private:
 	bool editing;
 	Text *text;
 	int counter;
 	bool blink;	
 };
-
-
 
 
 #endif	/* GFX_H */
