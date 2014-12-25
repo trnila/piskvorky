@@ -5,7 +5,7 @@ Font::Font(Root *root, TTF_Font *font) {
 	this->font = font;
 	this->maxWidth = 0;
 	this->root = root;
-	this->spacing=10;
+	this->spacing = 10;
 	build();
 }
 	
@@ -14,8 +14,9 @@ Font::~Font() {
 }
 	
 void Font::build() {
-        height = TTF_FontHeight(font);
-        bitmapHeight = ceil(('~' - ' ') / 8.0) * height;
+	height = TTF_FontHeight(font);
+	bitmapHeight = ceil(('~' - ' ') / 8.0) * height;
+	
 	// find font max width
 	for(char c = ' '; c <= '~'; c++) {
 		int minx, maxx;
@@ -36,17 +37,12 @@ void Font::build() {
 	dst.y = 0;
 	dst.w = maxWidth;
 	dst.h = bitmapHeight;
-
-
-        
         
 	for(char c = ' '; c <= '~'; c++) {
-                
-                if((c-' ')%8==0 and c != ' '){ //dirty hack :D
-                    dst.x=0;
-                    dst.y+=TTF_FontHeight(font);
-                    
-                }
+		if((c-' ') % 8 == 0 && c != ' ') { //dirty hack :D
+			dst.x = 0;
+			dst.y += TTF_FontHeight(font);            
+		}
 
 		SDL_Surface *letter = TTF_RenderGlyph_Blended(font, c, {255,255,255});
 		if(letter) {
@@ -55,7 +51,6 @@ void Font::build() {
 		}
 
 		dst.x += maxWidth;
-
 	}
 
 	SDL_SaveBMP(surf, "/tmp/a.bmp");
@@ -111,7 +106,7 @@ SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &col
 		}
 
 
-		widths[0] = 20;
+		//widths[0] = 20;
 		if(msg[i] >= ' ' && msg[i] <= '~') {
 			src.x = maxWidth * ((msg[i] - ' ')%8);
 			src.y = ceil((msg[i] - ' ') / 8)*height;
