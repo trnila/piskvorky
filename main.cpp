@@ -18,65 +18,230 @@ SDL_Texture* loadAsTexture(SDL_Renderer *renderer, const char *file) {
 	return texture;
 }
 
-void mainMenu(Root *root, Font *font) {
-	bool quit = false;
-	SDL_Event evt;
+enum class GameStateType {MainMenu, Game, Quit};
+
+class GameState {
+public:
+	GameState() {
+		quit = false;
+	}
 	
-	/*TBox header(&root, font, (SDL_Rect) {100, 100, 400, 100});
-	header.print("piskvorky");
-	header.setColor({0, 0, 0});*/
+	virtual void renderOneFrame() = 0;
+	virtual void injectEvent(SDL_Event &evt) {}
+	virtual void init() {}
+	virtual void deinit() {}
 	
-	Container container(root);
+	void reset() {
+		quit = false;
+	}
 	
-	Text header(root, font, TextType::Variable);
-	header.setText("Piskvorky");
-	header.setPosition({100, 100});
-	header.setColor({0, 0, 0});
-       // header.setFontSize(8);
-       // header.render();
+	bool isQuit() {
+		return quit;
+	}
 	
-	Text newGame(root, font, TextType::Variable);
-	newGame.setText("new game");
-	newGame.setPosition({100, 200});
-	newGame.setColor({0, 0, 255});
-	//newGame.setFontSize(18);
+	GameStateType getNextState() {
+		return nextState;
+	}
+
+protected:
+	void setQuit(GameStateType next) {
+		this->quit = true;
+		this->nextState = next;
+	}
 	
-	Input i(root, font, {400, 400, 100, 100});
+private:
+	GameStateType nextState;
+	bool quit;
+};
+
+class MainMenuState: public GameState {
+public:
+	MainMenuState(Root &root, Font &font):container(&root), root(root) {
+		Text *header = new Text(&root, &font, TextType::Variable);
+		header->setText("Piskvorky");
+		header->setPosition({100, 100});
+		header->setColor({0, 0, 0});
+
+		Text *newGame = new Text(&root, &font, TextType::Variable);
+		newGame->setText("new game");
+		newGame->setPosition({100, 200});
+		newGame->setColor({0, 0, 255});
+
+		Text *quitBtn = new Text(&root, &font, TextType::Variable);
+		quitBtn->setText("Quit");
+		quitBtn->setPosition({100, 300});
+		quitBtn->setColor({0, 0, 255});
+
+		Input *i = new Input(&root, &font, {400, 400, 100, 100});
+
+		container.addComponent(header);
+		container.addComponent(newGame);
+		container.addComponent(quitBtn);
+		container.addComponent(i);
+
+		GameStateType nextState = GameStateType::MainMenu;
+		newGame->onClick.push_back([&]() ->  void {
+			this->setQuit(GameStateType::Game);
+		});
+
+		quitBtn->onClick.push_back([&]() -> void {
+			setQuit(GameStateType::Quit);
+		});
+	}
 	
-	container.addComponent(&header);
-	container.addComponent(&newGame);
-	container.addComponent(&i);
-	
-	newGame.onClick.push_back([&]() ->  void {
-		quit = true;
-	});
-	
-	while(!quit) {
-		while(SDL_PollEvent(&evt)) {
-			if(evt.type == SDL_QUIT) {
-				quit = true;
-				exit(1);
-				break;
-			}
-			
-			container.injectEvent(&evt);
-		}
-		
-		SDL_SetRenderDrawColor(root->renderer, 255, 255, 255, 255);
-		SDL_RenderClear(root->renderer);
+	void renderOneFrame() {
+		SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
+		SDL_RenderClear(root.renderer);
 		
 		container.render();
 
 		
-		SDL_RenderPresent(root->renderer);
+		SDL_RenderPresent(root.renderer);
 	}
-}
+	
+	void injectEvent(SDL_Event &evt) {
+		container.injectEvent(&evt);
+	}
+	
+private:
+	Root &root;
+	Container container;
+};
+
+class PiskvorkyState: public GameState {
+public:
+	PiskvorkyState(Root &root): root(root), game(Game(20, 4)) {
+		cross = loadAsTexture(root.renderer, "cross.png");
+		circle = loadAsTexture(root.renderer, "circle.png");
+		if(cross == NULL || circle == NULL) {
+			std::cout << "cross or circle missing!";
+			exit(1);
+		}
+
+		cellSize = root.width / game.getCount();
+	}
+	
+	void init() {
+		SDL_ShowCursor(0);
+		game.reset();
+	}
+	
+	void deinit() {
+		SDL_ShowCursor(1);
+	}
+	
+
+	void injectEvent(SDL_Event& evt) {
+		if(evt.type == SDL_MOUSEBUTTONDOWN) {
+			int row = evt.motion.x / cellSize;
+			int col = evt.motion.y / cellSize;
+
+			game.step(row, col);
+		} else if(evt.type == SDL_QUIT) {
+			setQuit(GameStateType::Quit);
+		} else if(evt.type == SDL_MOUSEMOTION) {
+			mouse.x = evt.motion.x;
+			mouse.y = evt.motion.y;
+		} else if(evt.type == SDL_KEYDOWN) {
+			if(evt.key.keysym.sym == SDLK_ESCAPE) {
+				setQuit(GameStateType::MainMenu);
+			}
+		}
+	}
+
+	void renderOneFrame() {
+		SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
+		SDL_RenderClear(root.renderer);
+
+		// redraw lines
+		for(int i = 0; i < game.getCount(); i++) {
+			SDL_SetRenderDrawColor(root.renderer, 0, 0, 0, 255);
+			SDL_RenderDrawLine(root.renderer, 0, cellSize * i, root.width, cellSize * i); 
+			SDL_RenderDrawLine(root.renderer, cellSize * i, 0, cellSize*i, root.height);
+		}
+
+		// draw circles, crosses
+		for(int row = 0; row < game.getCount(); row++) {
+			for(int col = 0; col < game.getCount(); col++) {
+				SDL_Rect rect;
+				rect.w = rect.h = cellSize;
+				rect.x = row * cellSize;
+				rect.y = col * cellSize;
+
+				if(game.get(row, col) == CellType::Circle) {
+					SDL_RenderCopy(root.renderer, circle, NULL, &rect);
+				} else if(game.get(row, col) == CellType::Cross) {
+					SDL_RenderCopy(root.renderer, cross, NULL, &rect);
+				}
+			}
+		}
+
+		if(game.isWin()) {
+			Win win = game.getWin();
+
+			SDL_Point start;
+			start.x = win.startRow * cellSize;
+			start.y = win.startCol * cellSize;
+
+			SDL_Point end = start;
+			if(win.type == WinType::Vertical) {
+				end.x = start.x += cellSize / 2;
+				end.y += cellSize * win.count;
+			} else if(win.type == WinType::Horizontal) {
+				end.y = start.y += cellSize / 2;
+				end.x += cellSize * win.count;
+			} else if(win.type == WinType::MainDiagonal) {
+				end.x += cellSize * win.count;
+				end.y += cellSize * win.count;
+			} else if(win.type == WinType::MinorDiagonal) {
+				start.x += cellSize;
+
+				end.x -= cellSize * (win.count - 1);
+				end.y += cellSize * win.count;
+				//end.x = end.y = 0;
+			}
+
+			SDL_SetRenderDrawColor(root.renderer, 0, 0, 0, 255);
+			SDL_RenderDrawLine(
+				root.renderer,
+				start.x,
+				start.y,
+				end.x,
+				end.y				
+			);
+
+			if(win.symbol == CellType::Cross) {
+				SDL_RenderCopy(root.renderer, cross, NULL, NULL);
+			} else if(win.symbol == CellType::Circle) {
+				SDL_RenderCopy(root.renderer, circle, NULL, NULL);
+			}
+
+			SDL_RenderPresent(root.renderer);
+
+			SDL_Delay(1000);
+
+			game.reset();
+		}
+
+		SDL_Rect r = {mouse.x - 10, mouse.y - 10, 20, 20};
+		SDL_RenderCopy(root.renderer, game.getNextType() == CellType::Cross ? cross : circle, NULL, &r);
+
+		SDL_RenderPresent(root.renderer);
+	}
+	
+private:
+	Root &root;
+	SDL_Texture *cross;
+	SDL_Texture *circle;
+	Game game;
+	int cellSize;
+	SDL_Point mouse;
+};
 
 int main(int argc, char** argv) {
 	Root root;
 	root.width = 800;
 	root.height = 800;
-
 	
 	srand(time(NULL));
 
@@ -84,6 +249,7 @@ int main(int argc, char** argv) {
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		return 1;
 	}
+	
 	 	
 	// load support for the JPG and PNG image formats
 	int flags=IMG_INIT_JPG|IMG_INIT_PNG;
@@ -123,120 +289,50 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	
-	SDL_Texture *cross = loadAsTexture(root.renderer, "cross.png");
-	SDL_Texture *circle = loadAsTexture(root.renderer, "circle.png");
-	if(cross == NULL || circle == NULL) {
-		std::cout << "cross or circle missing!";
-		return 0;
-	}
 	
 	Font f(&root, font);
 	
-	mainMenu(&root, &f);
 	
-	SDL_ShowCursor(0);
+	MainMenuState mainMenu(root, f);
+	PiskvorkyState gameScene(root);
 	
-		
-	Game game(20, 4);
-	int cellSize = root.width / game.getCount();
-			
 	SDL_Event evt;
-	bool quit = false;
-	SDL_Point mouse;
-	while(!quit) {
-		SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
-		SDL_RenderClear(root.renderer);
+	
+	
+	GameStateType nextState = GameStateType::MainMenu;
+	while(nextState != GameStateType::Quit) {
+		GameState *state;
 		
-		while(SDL_PollEvent(&evt)) {
-			if(evt.type == SDL_MOUSEBUTTONDOWN) {
-				int row = evt.motion.x / cellSize;
-				int col = evt.motion.y / cellSize;
-				
-				game.step(row, col);
-			} else if(evt.type == SDL_QUIT) {
-				quit = true;
+		switch(nextState) {
+			case GameStateType::MainMenu:
+				state = &mainMenu;
 				break;
-			} else if(evt.type == SDL_MOUSEMOTION) {
-				mouse.x = evt.motion.x;
-				mouse.y = evt.motion.y;
-			}
+			case GameStateType::Game:
+				state = &gameScene;
+				break;				
 		}
-		
-		// redraw lines
-		for(int i = 0; i < game.getCount(); i++) {
-			SDL_SetRenderDrawColor(root.renderer, 0, 0, 0, 255);
-			SDL_RenderDrawLine(root.renderer, 0, cellSize * i, root.width, cellSize * i); 
-			SDL_RenderDrawLine(root.renderer, cellSize * i, 0, cellSize*i, root.height);
-		}
-		
-		// draw circles, crosses
-		for(int row = 0; row < game.getCount(); row++) {
-			for(int col = 0; col < game.getCount(); col++) {
-				SDL_Rect rect;
-				rect.w = rect.h = cellSize;
-				rect.x = row * cellSize;
-				rect.y = col * cellSize;
-				
-				if(game.get(row, col) == CellType::Circle) {
-					SDL_RenderCopy(root.renderer, circle, NULL, &rect);
-				} else if(game.get(row, col) == CellType::Cross) {
-					SDL_RenderCopy(root.renderer, cross, NULL, &rect);
+			
+		state->reset();
+		state->init();
+			
+		while(!state->isQuit()) {
+			while(SDL_PollEvent(&evt)) {
+				if(evt.type == SDL_QUIT) {
+					exit(1);
+					break;
+				} else {
+					state->injectEvent(evt);
 				}
 			}
+
+			state->renderOneFrame();
 		}
 		
-		if(game.isWin()) {
-			Win win = game.getWin();
-			
-			SDL_Point start;
-			start.x = win.startRow * cellSize;
-			start.y = win.startCol * cellSize;
-			
-			SDL_Point end = start;
-			if(win.type == WinType::Vertical) {
-				end.x = start.x += cellSize / 2;
-				end.y += cellSize * win.count;
-			} else if(win.type == WinType::Horizontal) {
-				end.y = start.y += cellSize / 2;
-				end.x += cellSize * win.count;
-			} else if(win.type == WinType::MainDiagonal) {
-				end.x += cellSize * win.count;
-				end.y += cellSize * win.count;
-			} else if(win.type == WinType::MinorDiagonal) {
-				start.x += cellSize;
-				
-				end.x -= cellSize * (win.count - 1);
-				end.y += cellSize * win.count;
-				//end.x = end.y = 0;
-			}
-			
-			SDL_SetRenderDrawColor(root.renderer, 0, 0, 0, 255);
-			SDL_RenderDrawLine(
-				root.renderer,
-				start.x,
-				start.y,
-				end.x,
-				end.y				
-			);
-			
-			if(win.symbol == CellType::Cross) {
-				SDL_RenderCopy(root.renderer, cross, NULL, NULL);
-			} else if(win.symbol == CellType::Circle) {
-				SDL_RenderCopy(root.renderer, circle, NULL, NULL);
-			}
-			
-			SDL_RenderPresent(root.renderer);
-			
-			SDL_Delay(1000);
-			
-			game.reset();
-		}
+		nextState = state->getNextState();
 		
-		SDL_Rect r = {mouse.x - 10, mouse.y - 10, 20, 20};
-		SDL_RenderCopy(root.renderer, game.getNextType() == CellType::Cross ? cross : circle, NULL, &r);
-		
-		SDL_RenderPresent(root.renderer);
+		state->deinit();
 	}
+	
 	
 	
 	return 0;
