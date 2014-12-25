@@ -5,7 +5,7 @@ Font::Font(Root *root, TTF_Font *font) {
 	this->font = font;
 	this->maxWidth = 0;
 	this->root = root;
-	
+	this->spacing=10;
 	build();
 }
 	
@@ -14,27 +14,28 @@ Font::~Font() {
 }
 	
 void Font::build() {
-        height = ceil(('~' - ' ') / 8.0) * TTF_FontHeight(font);
+        height = TTF_FontHeight(font);
+        bitmapHeight = ceil(('~' - ' ') / 8.0) * height;
 	// find font max width
 	for(char c = ' '; c <= '~'; c++) {
 		int minx, maxx;
 		if(TTF_GlyphMetrics(font, c, &minx,&maxx, NULL, NULL, NULL) == 0) {
 			int width = maxx - minx;
-			widths[c - ' '] = width;
+			widths[c - ' '] = width+spacing;
 
 			if(width > maxWidth) {
 				maxWidth = width;
 			}
 		}
 	}
-
-	SDL_Surface *surf = SDL_CreateRGBSurface(0, maxWidth * 8, height, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+        
+	SDL_Surface *surf = SDL_CreateRGBSurface(0, maxWidth * 8, bitmapHeight, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
 	SDL_Rect dst;
 	dst.x = 0;
 	dst.y = 0;
 	dst.w = maxWidth;
-	dst.h = height;
+	dst.h = bitmapHeight;
 
 
         
@@ -42,7 +43,6 @@ void Font::build() {
 	for(char c = ' '; c <= '~'; c++) {
                 
                 if((c-' ')%8==0 and c != ' '){ //dirty hack :D
-                    std::cout << (0)%8 << "ENDL"<<std::endl;
                     dst.x=0;
                     dst.y+=TTF_FontHeight(font);
                     
@@ -113,9 +113,9 @@ SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &col
 
 		widths[0] = 20;
 		if(msg[i] >= ' ' && msg[i] <= '~') {
-			src.x = maxWidth * (msg[i] - ' ');
-			src.y = 0;
-
+			src.x = maxWidth * ((msg[i] - ' ')%8);
+			src.y = ceil((msg[i] - ' ') / 8)*height;
+                        std::cout << src.x << "#" << src.y << std::endl;
 			dst.w = maxWidth;
 			w += widths[msg[i] - ' '];
 
@@ -133,5 +133,6 @@ SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &col
 	SDL_SetRenderDrawColor(root->renderer, 0, 255, 0, 125);
 	SDL_RenderFillRect(root->renderer, &result);
 	*/
+      //  std::cout << SDL_GetError() << std::endl;
 	return result;
 }

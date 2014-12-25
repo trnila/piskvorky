@@ -29,7 +29,7 @@ void mainMenu(Root *root, Font *font) {
 	Container container(root);
 	
 	Text header(root, font, TextType::Variable);
-	header.setText("1337");
+	header.setText("Piskvorky");
 	header.setPosition({100, 100});
 	header.setColor({0, 0, 0});
        // header.setFontSize(8);
