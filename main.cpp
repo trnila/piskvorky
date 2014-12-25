@@ -7,6 +7,7 @@
 #include "Gfx.h"
 #include "Root.h"
 #include "Game.h"
+#include <sstream>
 
 SDL_Texture* loadAsTexture(SDL_Renderer *renderer, const char *file) {
 	SDL_Surface *surf = IMG_Load(file);
@@ -112,9 +113,6 @@ public:
 		SDL_RenderClear(root.renderer);
 		
 		container.render();
-
-		
-		SDL_RenderPresent(root.renderer);
 	}
 	
 	void injectEvent(SDL_Event &evt) {
@@ -248,8 +246,6 @@ public:
 
 		SDL_Rect r = {mouse.x - 10, mouse.y - 10, 20, 20};
 		SDL_RenderCopy(root.renderer, game.getNextType() == CellType::Cross ? cross : circle, NULL, &r);
-
-		SDL_RenderPresent(root.renderer);
 	}
 	
 private:
@@ -320,7 +316,14 @@ int main(int argc, char** argv) {
 	
 	SDL_Event evt;
 	
-		
+	
+	Text fps(root, &f, TextType::Fixed);
+	fps.setColor({255, 0, 0});
+	fps.setPosition({0, 0});
+	
+	int fps_lasttime = SDL_GetTicks();
+	int fps_frames = 0;
+	
 	GameStateType nextState = GameStateType::MainMenu;
 	while(nextState != GameStateType::Quit) {
 		GameState *state;
@@ -346,8 +349,22 @@ int main(int argc, char** argv) {
 					state->injectEvent(evt);
 				}
 			}
-
+			
 			state->renderOneFrame();
+			
+			fps_frames++;
+			if (fps_lasttime < SDL_GetTicks() - 1*1000) {
+				fps_lasttime = SDL_GetTicks();
+				
+				std::stringstream out;
+				out << fps_frames;
+				
+				fps.setText(out.str());				
+				fps_frames = 0;
+			}
+			
+			fps.render();
+			SDL_RenderPresent(root.renderer);
 		}
 		
 		nextState = state->getNextState();
