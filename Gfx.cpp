@@ -115,7 +115,6 @@ SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &col
 		if(msg[i] >= ' ' && msg[i] <= '~') {
 			src.x = maxWidth * ((msg[i] - ' ')%8);
 			src.y = ceil((msg[i] - ' ') / 8)*height;
-                        std::cout << src.x << "#" << src.y << std::endl;
 			dst.w = maxWidth;
 			w += widths[msg[i] - ' '];
 
@@ -133,6 +132,5 @@ SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &col
 	SDL_SetRenderDrawColor(root->renderer, 0, 255, 0, 125);
 	SDL_RenderFillRect(root->renderer, &result);
 	*/
-      //  std::cout << SDL_GetError() << std::endl;
 	return result;
 }
