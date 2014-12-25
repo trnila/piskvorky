@@ -129,3 +129,14 @@ SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &col
 	*/
 	return result;
 }
+
+SDL_Texture* loadAsTexture(SDL_Renderer *renderer, const char *file) {
+	SDL_Surface *surf = IMG_Load(file);
+	if(surf == NULL) {
+		return NULL;
+	}
+	
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surf);
+	SDL_FreeSurface(surf);
+	return texture;
+}

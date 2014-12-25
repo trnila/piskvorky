@@ -3,12 +3,15 @@
 #include <string>
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <SDL_image.h>
 #include <vector>
 #include <stack>
 #include <functional>
+#include <iostream>
 #include "Root.h"
 
-#include <iostream>
+SDL_Texture* loadAsTexture(SDL_Renderer *renderer, const char *file);
+
 
 class Component {
 public:
@@ -285,6 +288,46 @@ private:
 	int counter;
 	bool blink;	
 };
+
+class CheckBox: public Component {
+public:
+	CheckBox(Root& root): Component(root), checked(false) {
+		emptyTexture = loadAsTexture(root.renderer, "tick.png");
+		checkedTexture = loadAsTexture(root.renderer, "tick-checked.png");
+		
+		rect.w = 20;
+		rect.h = 20;
+		
+		onClick.push_back([&]() -> void {
+			checked = !checked;
+		});
+	}
+	
+	void setPosition(SDL_Point point) {
+		rect.x = point.x;
+		rect.y = point.y;
+	}
+	
+	void setChecked(bool checked = true) {
+		this->checked = checked;
+	}
+	
+	bool isChecked() {
+		return checked;
+	}
+	
+	void render() {
+		SDL_RenderCopy(root.renderer, checked ? checkedTexture : emptyTexture, NULL, &rect);
+	}
+
+private:
+	SDL_Texture *emptyTexture;
+	SDL_Texture *checkedTexture;
+	bool checked;
+	SDL_Point position;
+};
+
+
 
 
 #endif	/* GFX_H */

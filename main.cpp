@@ -8,19 +8,10 @@
 #include "Root.h"
 #include "Game.h"
 #include <sstream>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_keycode.h>
 
-SDL_Texture* loadAsTexture(SDL_Renderer *renderer, const char *file) {
-	SDL_Surface *surf = IMG_Load(file);
-	if(surf == NULL) {
-		return NULL;
-	}
-	
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surf);
-	SDL_FreeSurface(surf);
-	return texture;
-}
-
-enum class GameStateType {MainMenu, Game, Quit};
+enum class GameStateType {MainMenu, Game, Settings, Quit};
 
 class GameState {
 public:
@@ -56,6 +47,48 @@ private:
 	bool quit;
 };
 
+class SettingsState: public GameState {
+public:
+	SettingsState(Root &root, Font &font):container(root), root(root) {
+		Text *header = new Text(root, &font, TextType::Variable);
+		header->setText("Settings");
+		header->setPosition({100, 100});
+		header->setColor({0, 0, 0});
+		
+		CheckBox *box = new CheckBox(root);
+		box->setPosition({100, 200});
+		
+		
+		container.addComponent(header);		
+		container.addComponent(box);
+	}
+	
+
+	void injectEvent(SDL_Event& evt) {
+		if(evt.type == SDL_KEYDOWN) {
+			if(evt.key.keysym.sym == SDLK_ESCAPE) {
+				setQuit(GameStateType::MainMenu);
+			} else if(evt.key.keysym.sym == SDLK_g) {
+				SDL_SetWindowSize(root.window, 100, 100);
+			}
+		}
+		
+		container.injectEvent(evt);
+	}
+
+
+	void renderOneFrame() {
+		SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
+		SDL_RenderClear(root.renderer);
+		
+		container.render();
+	}
+	
+private:
+	Root &root;
+	Container container;
+};
+
 class MainMenuState: public GameState {
 public:
 	MainMenuState(Root &root, Font &font):container(root), root(root) {
@@ -68,10 +101,15 @@ public:
 		newGame->setText("new game");
 		newGame->setPosition({100, 200});
 		newGame->setColor({0, 0, 255});
+		
+		Text *settings = new Text(root, &font, TextType::Variable);
+		settings->setText("Settings");
+		settings->setPosition({100, 300});
+		settings->setColor({0, 0, 255});
 
 		Text *quitBtn = new Text(root, &font, TextType::Variable);
 		quitBtn->setText("Quit");
-		quitBtn->setPosition({100, 300});
+		quitBtn->setPosition({100, 400});
 		quitBtn->setColor({0, 0, 255});
 
 		Input *i = new Input(root, &font, {400, 400, 100, 100});
@@ -82,6 +120,10 @@ public:
 
 		quitBtn->onClick.push_back([&]() -> void {
 			setQuit(GameStateType::Quit);
+		});
+		
+		settings->onClick.push_back([&]() -> void {
+			setQuit(GameStateType::Settings);
 		});
 		
 		// move out
@@ -104,6 +146,7 @@ public:
 		
 		container.addComponent(header);
 		container.addComponent(newGame);
+		container.addComponent(settings);
 		container.addComponent(quitBtn);
 		container.addComponent(i);		
 	}
@@ -313,6 +356,7 @@ int main(int argc, char** argv) {
 		
 	MainMenuState mainMenu(root, f);
 	PiskvorkyState gameScene(root);
+	SettingsState settingsState(root, f);
 	
 	SDL_Event evt;
 	
@@ -335,6 +379,9 @@ int main(int argc, char** argv) {
 			case GameStateType::Game:
 				state = &gameScene;
 				break;				
+			case GameStateType::Settings:
+				state = &settingsState;
+				break;
 		}
 			
 		state->reset();
