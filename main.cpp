@@ -29,9 +29,11 @@ void mainMenu(Root *root, Font *font) {
 	Container container(root);
 	
 	Text header(root, font, TextType::Variable);
-	header.setText("piskvorky");
+	header.setText("Piskvorky");
 	header.setPosition({100, 100});
 	header.setColor({0, 0, 0});
+       // header.setFontSize(8);
+       // header.render();
 	
 	Text newGame(root, font, TextType::Variable);
 	newGame.setText("new game");
@@ -74,6 +76,7 @@ int main(int argc, char** argv) {
 	Root root;
 	root.width = 800;
 	root.height = 800;
+
 	
 	srand(time(NULL));
 
@@ -81,7 +84,6 @@ int main(int argc, char** argv) {
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		return 1;
 	}
-	
 	 	
 	// load support for the JPG and PNG image formats
 	int flags=IMG_INIT_JPG|IMG_INIT_PNG;

@@ -1,10 +1,11 @@
 #include "Gfx.h"
+#include "math.h"
 
 Font::Font(Root *root, TTF_Font *font) {
 	this->font = font;
 	this->maxWidth = 0;
 	this->root = root;
-	
+	this->spacing=10;
 	build();
 }
 	
@@ -13,30 +14,40 @@ Font::~Font() {
 }
 	
 void Font::build() {
-	height = TTF_FontHeight(font);
-
+        height = TTF_FontHeight(font);
+        bitmapHeight = ceil(('~' - ' ') / 8.0) * height;
 	// find font max width
 	for(char c = ' '; c <= '~'; c++) {
 		int minx, maxx;
 		if(TTF_GlyphMetrics(font, c, &minx,&maxx, NULL, NULL, NULL) == 0) {
 			int width = maxx - minx;
-			widths[c - ' '] = width;
+			widths[c - ' '] = width+spacing;
 
 			if(width > maxWidth) {
 				maxWidth = width;
 			}
 		}
 	}
-
-	SDL_Surface *surf = SDL_CreateRGBSurface(0, maxWidth * ('~' - ' '), 100, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+        
+	SDL_Surface *surf = SDL_CreateRGBSurface(0, maxWidth * 8, bitmapHeight, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
 	SDL_Rect dst;
 	dst.x = 0;
 	dst.y = 0;
 	dst.w = maxWidth;
-	dst.h = height;
+	dst.h = bitmapHeight;
 
+
+        
+        
 	for(char c = ' '; c <= '~'; c++) {
+                
+                if((c-' ')%8==0 and c != ' '){ //dirty hack :D
+                    dst.x=0;
+                    dst.y+=TTF_FontHeight(font);
+                    
+                }
+
 		SDL_Surface *letter = TTF_RenderGlyph_Blended(font, c, {255,255,255});
 		if(letter) {
 			SDL_BlitSurface(letter, NULL, surf, &dst);
@@ -44,6 +55,7 @@ void Font::build() {
 		}
 
 		dst.x += maxWidth;
+
 	}
 
 	SDL_SaveBMP(surf, "/tmp/a.bmp");
@@ -101,9 +113,8 @@ SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &col
 
 		widths[0] = 20;
 		if(msg[i] >= ' ' && msg[i] <= '~') {
-			src.x = maxWidth * (msg[i] - ' ');
-			src.y = 0;
-
+			src.x = maxWidth * ((msg[i] - ' ')%8);
+			src.y = ceil((msg[i] - ' ') / 8)*height;
 			dst.w = maxWidth;
 			w += widths[msg[i] - ' '];
 

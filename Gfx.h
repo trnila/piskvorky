@@ -130,7 +130,13 @@ private:
 	
 	/* font height */
 	int height;
-	
+        
+        /* temp bitmap height */
+        int bitmapHeight;
+
+	/* Spacing between letters */
+	int spacing;
+        
 	/* width of the widest font */
 	int maxWidth;
 	
