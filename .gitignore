@@ -2,3 +2,9 @@ nbproject/private
 dist/
 build/
 .dep.inc
+
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
