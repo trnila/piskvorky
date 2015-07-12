@@ -1,13 +1,12 @@
 #ifndef PISKVORKYSTATE_H
 #define	PISKVORKYSTATE_H
-#include "../Root.h"
 #include "../Game.h"
 #include "../Gfx.h"
 #include "AbstractGameState.h"
 
 class PiskvorkyState: public AbstractGameState {
 public:
-	PiskvorkyState(Root &root);	
+	PiskvorkyState(Window &window);	
 	~PiskvorkyState();	
 	
 	void init();	

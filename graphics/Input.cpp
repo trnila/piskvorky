@@ -1,6 +1,6 @@
 #include "Input.h"
 
-Input::Input(Root& root, Font *font, SDL_Rect rect): Component(root) {
+Input::Input(Window &window, Font *font, SDL_Rect rect): Component(window) {
 	this->rect = rect;
 
 	editing = false;
@@ -8,17 +8,17 @@ Input::Input(Root& root, Font *font, SDL_Rect rect): Component(root) {
 	blink = 0;
 	counter = 0;
 
-	text = new Text(root, font, TextType::Fixed);
+	text = new Text(window, font, TextType::Fixed);
 	text->setRect(rect);
 	text->setColor({255, 0, 0});
 	text->setText("Daniel");
 
 	onMouseMoveIn.push_back([&]() -> void {
-		root.setTextCursor();
+		//root.setTextCursor();
 	});
 
 	onMouseMoveOut.push_back([&]() -> void {
-		root.setDefaultCursor();			
+		//root.setDefaultCursor();			
 	});
 
 	onClick.push_back([&]() -> void {
@@ -53,8 +53,8 @@ Input::~Input() {
 }
 
 void Input::render() {
-	SDL_SetRenderDrawColor(root.renderer, 255, 0, 0, 0);
-	SDL_RenderDrawRect(root.renderer, &rect);
+	SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 0);
+	SDL_RenderDrawRect(window.getRenderer(), &rect);
 
 	text->render();
 
@@ -67,7 +67,7 @@ void Input::render() {
 		if(blink) {
 			SDL_Rect r = text->getRect();
 			SDL_RenderDrawLine(
-				root.renderer, 
+				window.getRenderer(), 
 				r.x + r.w + 10,
 				r.y,
 				r.x + r.w + 10,

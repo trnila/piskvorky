@@ -6,7 +6,7 @@
 
 class Container: public Component {
 public:
-	Container(Root &root);
+	Container(Window &window);
 	~Container();
 	
 	void addComponent(Component *component);

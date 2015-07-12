@@ -1,13 +1,12 @@
 #ifndef FONT_H
 #define	FONT_H
 #include <SDL_ttf.h>
-#include "../Root.h"
 
 class Font {
 private:
-	Root *root;
 	TTF_Font *font;
 	SDL_Texture *texture;
+	SDL_Renderer *renderer;
 	
 	/* font height */
 	int height;
@@ -24,7 +23,7 @@ private:
 	/* an array of invidual character width */
 	int widths['~' - ' '];
 public:
-	Font(Root *root, TTF_Font *font);
+	Font(SDL_Renderer *renderer, TTF_Font *font);
 	~Font();
 	
 	void build();

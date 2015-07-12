@@ -25,6 +25,8 @@
         <itemPath>graphics/Input.h</itemPath>
         <itemPath>graphics/Text.cpp</itemPath>
         <itemPath>graphics/Text.h</itemPath>
+        <itemPath>graphics/Window.cpp</itemPath>
+        <itemPath>graphics/Window.h</itemPath>
       </logicalFolder>
       <logicalFolder name="states" displayName="states" projectFiles="true">
         <itemPath>states/AbstractGameState.cpp</itemPath>
@@ -41,8 +43,6 @@
       <itemPath>Gfx.cpp</itemPath>
       <itemPath>Gfx.h</itemPath>
       <itemPath>Makefile</itemPath>
-      <itemPath>Root.cpp</itemPath>
-      <itemPath>Root.h</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -91,10 +91,6 @@
       </item>
       <item path="Makefile" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="Root.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="Root.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="graphics/CheckBox.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="graphics/CheckBox.h" ex="false" tool="3" flavor2="0">
@@ -118,6 +114,10 @@
       <item path="graphics/Text.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="graphics/Text.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Window.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Window.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -168,10 +168,6 @@
       </item>
       <item path="Makefile" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="Root.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="Root.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="graphics/CheckBox.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="graphics/CheckBox.h" ex="false" tool="3" flavor2="0">
@@ -195,6 +191,10 @@
       <item path="graphics/Text.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="graphics/Text.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Window.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Window.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>

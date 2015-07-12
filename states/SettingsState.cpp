@@ -1,12 +1,12 @@
 #include "SettingsState.h"
 
-SettingsState::SettingsState(Root &root, Font &font): AbstractGameState(root), container(root) {
-	Text *header = new Text(root, &font, TextType::Variable);
+SettingsState::SettingsState(Window &window, Font &font): AbstractGameState(window), container(window) {
+	Text *header = new Text(window, &font, TextType::Variable);
 	header->setText("Settings");
 	header->setPosition({100, 100});
 	header->setColor({0, 0, 0});
 
-	CheckBox *box = new CheckBox(root);
+	CheckBox *box = new CheckBox(window);
 	box->setPosition({100, 200});
 
 
@@ -20,7 +20,8 @@ void SettingsState::injectEvent(SDL_Event& evt) {
 		if(evt.key.keysym.sym == SDLK_ESCAPE) {
 			setQuit(GameStateType::MainMenu);
 		} else if(evt.key.keysym.sym == SDLK_g) {
-			SDL_SetWindowSize(root.window, 100, 100);
+			//SDL_SetWindowSize(window, 100, 100);
+			//TODO: fix
 		}
 	}
 
@@ -29,8 +30,8 @@ void SettingsState::injectEvent(SDL_Event& evt) {
 
 
 void SettingsState::renderOneFrame() {
-	SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
-	SDL_RenderClear(root.renderer);
+	SDL_SetRenderDrawColor(window.getRenderer(), 255, 255, 255, 255);
+	SDL_RenderClear(window.getRenderer());
 
 	container.render();
 }

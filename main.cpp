@@ -9,18 +9,14 @@
 #include "states/MainMenuState.h"
 #include "states/PiskvorkyState.h"
 #include "Gfx.h"
-#include "Root.h"
 #include "Game.h"
+#include "graphics/Window.h"
 #include <sstream>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keycode.h>
 
 
 int main(int argc, char** argv) {
-	Root root;
-	root.width = 800;
-	root.height = 800;
-	
 	srand(time(NULL));
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
@@ -46,20 +42,7 @@ int main(int argc, char** argv) {
 	}
 	
 	
-	root.window = SDL_CreateWindow("Piskvorky", 100, 100, root.width, root.height, SDL_WINDOW_SHOWN);
-	if (root.window == nullptr){
-		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
-		SDL_Quit();
-		return 1;
-	}
-	
-	root.renderer = SDL_CreateRenderer(root.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (root.renderer == nullptr){
-		SDL_DestroyWindow(root.window);
-		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
-		SDL_Quit();
-		return 1;
-	}
+	Window window(800, 600);
 	
 	TTF_Font *font = TTF_OpenFont("/usr/share/fonts/TTF/Vera.ttf", 50);
 	if (font == nullptr){
@@ -68,16 +51,16 @@ int main(int argc, char** argv) {
 	}
 	
 	
-	Font f(&root, font);
+	Font f(window.getRenderer(), font);
 		
-	MainMenuState mainMenu(root, f);
-	PiskvorkyState gameScene(root);
-	SettingsState settingsState(root, f);
+	MainMenuState mainMenu(window, f);
+	PiskvorkyState gameScene(window);
+	SettingsState settingsState(window, f);
 	
 	SDL_Event evt;
 	
 	
-	Text fps(root, &f, TextType::Fixed);
+	Text fps(window, &f, TextType::Fixed);
 	fps.setColor({255, 0, 0});
 	fps.setPosition({0, 0});
 	
@@ -127,7 +110,7 @@ int main(int argc, char** argv) {
 			}
 			
 			fps.render();
-			SDL_RenderPresent(root.renderer);
+			SDL_RenderPresent(window.getRenderer());
 		}
 		
 		nextState = state->getNextState();

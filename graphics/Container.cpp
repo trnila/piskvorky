@@ -1,6 +1,6 @@
 #include "Container.h"
 
-Container::Container(Root &root): Component(root) {}
+Container::Container(Window &window): Component(window) {}
 Container::~Container() {
 	for(Component* component : components) {
 		delete component;

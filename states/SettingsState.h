@@ -9,7 +9,7 @@
 
 class SettingsState: public AbstractGameState {
 public:
-	SettingsState(Root &root, Font &font);
+	SettingsState(Window &window, Font &font);
 	void injectEvent(SDL_Event& evt);
 	void renderOneFrame();
 	

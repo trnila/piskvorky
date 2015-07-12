@@ -7,7 +7,7 @@ enum class TextType {Variable, Fixed};
 
 class Text: public Component {
 public:
-	Text(Root &root, Font *font, TextType type);
+	Text(Window &window, Font *font, TextType type);
 	void setText(const std::string &text);
 	std::string& getText();
 	

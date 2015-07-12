@@ -1,6 +1,6 @@
 #include "Component.h"
 
-Component::Component(Root &root): root(root), visible(true), mousedIn(false), focused(false){}
+Component::Component(Window &window): window(window), visible(true), mousedIn(false), focused(false){}
 Component::~Component() {}
 
 void Component::injectEvent(const SDL_Event &evt) {

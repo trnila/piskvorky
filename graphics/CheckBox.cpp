@@ -1,8 +1,8 @@
 #include "CheckBox.h"
 
-CheckBox::CheckBox(Root& root): Component(root), checked(false) {
-	emptyTexture = loadAsTexture(root.renderer, "tick.png");
-	checkedTexture = loadAsTexture(root.renderer, "tick-checked.png");
+CheckBox::CheckBox(Window &window): Component(window), checked(false) {
+	emptyTexture = loadAsTexture(window.getRenderer(), "tick.png");
+	checkedTexture = loadAsTexture(window.getRenderer(), "tick-checked.png");
 
 	rect.w = 20;
 	rect.h = 20;
@@ -26,5 +26,5 @@ bool CheckBox::isChecked() {
 }
 
 void CheckBox::render() {
-	SDL_RenderCopy(root.renderer, checked ? checkedTexture : emptyTexture, NULL, &rect);
+	SDL_RenderCopy(window.getRenderer(), checked ? checkedTexture : emptyTexture, NULL, &rect);
 }

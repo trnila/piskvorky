@@ -1,27 +1,27 @@
 #include "MainMenuState.h"
 
-MainMenuState::MainMenuState(Root &root, Font &font): AbstractGameState(root), container(root){
-	Text *header = new Text(root, &font, TextType::Variable);
+MainMenuState::MainMenuState(Window &window, Font &font): AbstractGameState(window), container(window){
+	Text *header = new Text(window, &font, TextType::Variable);
 	header->setText("Piskvorky");
 	header->setPosition({100, 100});
 	header->setColor({0, 0, 0});
 
-	Text *newGame = new Text(root, &font, TextType::Variable);
+	Text *newGame = new Text(window, &font, TextType::Variable);
 	newGame->setText("new game");
 	newGame->setPosition({100, 200});
 	newGame->setColor({0, 0, 255});
 
-	Text *settings = new Text(root, &font, TextType::Variable);
+	Text *settings = new Text(window, &font, TextType::Variable);
 	settings->setText("Settings");
 	settings->setPosition({100, 300});
 	settings->setColor({0, 0, 255});
 
-	Text *quitBtn = new Text(root, &font, TextType::Variable);
+	Text *quitBtn = new Text(window, &font, TextType::Variable);
 	quitBtn->setText("Quit");
 	quitBtn->setPosition({100, 400});
 	quitBtn->setColor({0, 0, 255});
 
-	Input *i = new Input(root, &font, {400, 400, 100, 100});
+	Input *i = new Input(window, &font, {400, 400, 100, 100});
 
 	newGame->onClick.push_back([&]() ->  void {
 		this->setQuit(GameStateType::Game);
@@ -61,8 +61,8 @@ MainMenuState::MainMenuState(Root &root, Font &font): AbstractGameState(root), c
 }
 
 void MainMenuState::renderOneFrame() {
-	SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
-	SDL_RenderClear(root.renderer);
+	SDL_SetRenderDrawColor(window.getRenderer(), 255, 255, 255, 255);
+	SDL_RenderClear(window.getRenderer());
 
 	container.render();
 }

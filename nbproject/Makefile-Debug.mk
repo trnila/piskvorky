@@ -37,13 +37,13 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/Game.o \
 	${OBJECTDIR}/Gfx.o \
-	${OBJECTDIR}/Root.o \
 	${OBJECTDIR}/graphics/CheckBox.o \
 	${OBJECTDIR}/graphics/Component.o \
 	${OBJECTDIR}/graphics/Container.o \
 	${OBJECTDIR}/graphics/Font.o \
 	${OBJECTDIR}/graphics/Input.o \
 	${OBJECTDIR}/graphics/Text.o \
+	${OBJECTDIR}/graphics/Window.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/states/AbstractGameState.o \
 	${OBJECTDIR}/states/MainMenuState.o \
@@ -85,11 +85,6 @@ ${OBJECTDIR}/Gfx.o: Gfx.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g `pkg-config --cflags SDL2_ttf` `pkg-config --cflags sdl2` `pkg-config --cflags SDL2_image` -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Gfx.o Gfx.cpp
 
-${OBJECTDIR}/Root.o: Root.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g `pkg-config --cflags SDL2_ttf` `pkg-config --cflags sdl2` `pkg-config --cflags SDL2_image` -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Root.o Root.cpp
-
 ${OBJECTDIR}/graphics/CheckBox.o: graphics/CheckBox.cpp 
 	${MKDIR} -p ${OBJECTDIR}/graphics
 	${RM} "$@.d"
@@ -119,6 +114,11 @@ ${OBJECTDIR}/graphics/Text.o: graphics/Text.cpp
 	${MKDIR} -p ${OBJECTDIR}/graphics
 	${RM} "$@.d"
 	$(COMPILE.cc) -g `pkg-config --cflags SDL2_ttf` `pkg-config --cflags sdl2` `pkg-config --cflags SDL2_image` -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/graphics/Text.o graphics/Text.cpp
+
+${OBJECTDIR}/graphics/Window.o: graphics/Window.cpp 
+	${MKDIR} -p ${OBJECTDIR}/graphics
+	${RM} "$@.d"
+	$(COMPILE.cc) -g `pkg-config --cflags SDL2_ttf` `pkg-config --cflags sdl2` `pkg-config --cflags SDL2_image` -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/graphics/Window.o graphics/Window.cpp
 
 ${OBJECTDIR}/main.o: main.cpp 
 	${MKDIR} -p ${OBJECTDIR}

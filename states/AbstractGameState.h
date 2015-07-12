@@ -1,13 +1,13 @@
 #ifndef ABSTRACTGAMESTATE_H
 #define	ABSTRACTGAMESTATE_H
 
-#include "../Root.h"
+#include "../graphics/Window.h"
 
 enum class GameStateType {MainMenu, Game, Settings, Quit};
 
 class AbstractGameState {
 public:
-	AbstractGameState(Root &root);
+	AbstractGameState(Window &window);
 	virtual ~AbstractGameState();
 		
 	virtual void renderOneFrame() = 0;
@@ -20,7 +20,7 @@ public:
 	GameStateType getNextState();
 	
 protected:
-	Root &root;
+	Window &window;
 	void setQuit(GameStateType next);
 private:
 	GameStateType nextState;

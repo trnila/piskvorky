@@ -1,9 +1,9 @@
 #include "Font.h"
 
-Font::Font(Root *root, TTF_Font *font) {
+Font::Font(SDL_Renderer *renderer, TTF_Font *font) {
 	this->font = font;
 	this->maxWidth = 0;
-	this->root = root;
+	this->renderer = renderer;
 	this->spacing = 10;
 	build();
 }
@@ -53,7 +53,7 @@ void Font::build() {
 	}
 
 	SDL_SaveBMP(surf, "/tmp/a.bmp");
-	texture = SDL_CreateTextureFromSurface(root->renderer, surf);
+	texture = SDL_CreateTextureFromSurface(renderer, surf);
 	
 	SDL_FreeSurface(surf);
 
@@ -112,7 +112,7 @@ SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &col
 			dst.w = maxWidth;
 			w += widths[msg[i] - ' '];
 
-			SDL_RenderCopy(root->renderer, texture, &src, &dst);
+			SDL_RenderCopy(renderer, texture, &src, &dst);
 
 			dst.x += widths[msg[i] - ' '];				
 		}

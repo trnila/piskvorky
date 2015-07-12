@@ -1,14 +1,14 @@
 #include "PiskvorkyState.h"
 
-PiskvorkyState::PiskvorkyState(Root &root): AbstractGameState(root), game(Game(20, 4)) {
-	cross = loadAsTexture(root.renderer, "cross.png");
-	circle = loadAsTexture(root.renderer, "circle.png");
+PiskvorkyState::PiskvorkyState(Window &window): AbstractGameState(window), game(Game(20, 4)) {
+	cross = loadAsTexture(window.getRenderer(), "cross.png");
+	circle = loadAsTexture(window.getRenderer(), "circle.png");
 	if(cross == NULL || circle == NULL) {
 		std::cout << "cross or circle missing!";
 		exit(1);
 	}
 
-	cellSize = 800 / game.getCount();
+	cellSize = window.getWidth() / game.getCount();
 }
 
 PiskvorkyState::~PiskvorkyState() {
@@ -45,14 +45,14 @@ void PiskvorkyState::injectEvent(SDL_Event& evt) {
 }
 
 void PiskvorkyState::renderOneFrame() {
-	SDL_SetRenderDrawColor(root.renderer, 255, 255, 255, 255);
-	SDL_RenderClear(root.renderer);
+	SDL_SetRenderDrawColor(window.getRenderer(), 255, 255, 255, 255);
+	SDL_RenderClear(window.getRenderer());
 
 	// redraw lines
 	for(int i = 0; i < game.getCount(); i++) {
-		SDL_SetRenderDrawColor(root.renderer, 0, 0, 0, 255);
-		SDL_RenderDrawLine(root.renderer, 0, cellSize * i, root.width, cellSize * i); 
-		SDL_RenderDrawLine(root.renderer, cellSize * i, 0, cellSize*i, root.height);
+		SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
+		SDL_RenderDrawLine(window.getRenderer(), 0, cellSize * i, window.getWidth(), cellSize * i); 
+		SDL_RenderDrawLine(window.getRenderer(), cellSize * i, 0, cellSize*i, window.getHeight());
 	}
 
 	// draw circles, crosses
@@ -64,9 +64,9 @@ void PiskvorkyState::renderOneFrame() {
 			rect.y = col * cellSize;
 
 			if(game.get(row, col) == CellType::Circle) {
-				SDL_RenderCopy(root.renderer, circle, NULL, &rect);
+				SDL_RenderCopy(window.getRenderer(), circle, NULL, &rect);
 			} else if(game.get(row, col) == CellType::Cross) {
-				SDL_RenderCopy(root.renderer, cross, NULL, &rect);
+				SDL_RenderCopy(window.getRenderer(), cross, NULL, &rect);
 			}
 		}
 	}
@@ -96,9 +96,9 @@ void PiskvorkyState::renderOneFrame() {
 			//end.x = end.y = 0;
 		}
 
-		SDL_SetRenderDrawColor(root.renderer, 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
 		SDL_RenderDrawLine(
-			root.renderer,
+			window.getRenderer(),
 			start.x,
 			start.y,
 			end.x,
@@ -106,12 +106,12 @@ void PiskvorkyState::renderOneFrame() {
 		);
 
 		if(win.symbol == CellType::Cross) {
-			SDL_RenderCopy(root.renderer, cross, NULL, NULL);
+			SDL_RenderCopy(window.getRenderer(), cross, NULL, NULL);
 		} else if(win.symbol == CellType::Circle) {
-			SDL_RenderCopy(root.renderer, circle, NULL, NULL);
+			SDL_RenderCopy(window.getRenderer(), circle, NULL, NULL);
 		}
 
-		SDL_RenderPresent(root.renderer);
+		SDL_RenderPresent(window.getRenderer());
 
 		SDL_Delay(1000);
 
@@ -119,5 +119,5 @@ void PiskvorkyState::renderOneFrame() {
 	}
 
 	SDL_Rect r = {mouse.x - 10, mouse.y - 10, 20, 20};
-	SDL_RenderCopy(root.renderer, game.getNextType() == CellType::Cross ? cross : circle, NULL, &r);
+	SDL_RenderCopy(window.getRenderer(), game.getNextType() == CellType::Cross ? cross : circle, NULL, &r);
 }

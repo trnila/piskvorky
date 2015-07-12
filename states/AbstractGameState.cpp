@@ -1,6 +1,6 @@
 #include "AbstractGameState.h"
 
-AbstractGameState::AbstractGameState(Root &root): root(root) {
+AbstractGameState::AbstractGameState(Window &window): window(window) {
 	quit = false;
 }
 

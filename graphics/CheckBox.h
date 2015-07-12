@@ -5,7 +5,7 @@
 
 class CheckBox: public Component {
 public:
-	CheckBox(Root& root);
+	CheckBox(Window &window);
 	void setPosition(SDL_Point point);
 	void setChecked(bool checked = true);
 	bool isChecked();

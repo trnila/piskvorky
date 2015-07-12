@@ -1,6 +1,6 @@
 #include "Text.h"
 
-Text::Text(Root &root, Font *font, TextType type): Component(root) {
+Text::Text(Window &window, Font *font, TextType type): Component(window) {
 	this->font = font;
 	fontSize = 0;
 

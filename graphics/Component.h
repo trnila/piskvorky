@@ -2,11 +2,11 @@
 #define	COMPONENT_H
 #include <vector>
 #include <functional>
-#include "../Root.h"
+#include "../graphics/Window.h"
 
 class Component {
 public:
-	Component(Root &root);
+	Component(Window &window);
 	virtual ~Component();
 		
 	bool isVisible() {
@@ -32,7 +32,7 @@ public:
 	std::vector<std::function<void(const SDL_Event &evt)>> onTextInput;
 		
 protected:
-	Root &root;
+	Window &window;
 	bool visible;
 	SDL_Rect rect;
 	
