@@ -38,7 +38,17 @@ OBJECTFILES= \
 	${OBJECTDIR}/Game.o \
 	${OBJECTDIR}/Gfx.o \
 	${OBJECTDIR}/Root.o \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/graphics/CheckBox.o \
+	${OBJECTDIR}/graphics/Component.o \
+	${OBJECTDIR}/graphics/Container.o \
+	${OBJECTDIR}/graphics/Font.o \
+	${OBJECTDIR}/graphics/Input.o \
+	${OBJECTDIR}/graphics/Text.o \
+	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/states/AbstractGameState.o \
+	${OBJECTDIR}/states/MainMenuState.o \
+	${OBJECTDIR}/states/PiskvorkyState.o \
+	${OBJECTDIR}/states/SettingsState.o
 
 
 # C Compiler Flags
@@ -80,10 +90,60 @@ ${OBJECTDIR}/Root.o: Root.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Root.o Root.cpp
 
+${OBJECTDIR}/graphics/CheckBox.o: graphics/CheckBox.cpp 
+	${MKDIR} -p ${OBJECTDIR}/graphics
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/graphics/CheckBox.o graphics/CheckBox.cpp
+
+${OBJECTDIR}/graphics/Component.o: graphics/Component.cpp 
+	${MKDIR} -p ${OBJECTDIR}/graphics
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/graphics/Component.o graphics/Component.cpp
+
+${OBJECTDIR}/graphics/Container.o: graphics/Container.cpp 
+	${MKDIR} -p ${OBJECTDIR}/graphics
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/graphics/Container.o graphics/Container.cpp
+
+${OBJECTDIR}/graphics/Font.o: graphics/Font.cpp 
+	${MKDIR} -p ${OBJECTDIR}/graphics
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/graphics/Font.o graphics/Font.cpp
+
+${OBJECTDIR}/graphics/Input.o: graphics/Input.cpp 
+	${MKDIR} -p ${OBJECTDIR}/graphics
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/graphics/Input.o graphics/Input.cpp
+
+${OBJECTDIR}/graphics/Text.o: graphics/Text.cpp 
+	${MKDIR} -p ${OBJECTDIR}/graphics
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/graphics/Text.o graphics/Text.cpp
+
 ${OBJECTDIR}/main.o: main.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+
+${OBJECTDIR}/states/AbstractGameState.o: states/AbstractGameState.cpp 
+	${MKDIR} -p ${OBJECTDIR}/states
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/states/AbstractGameState.o states/AbstractGameState.cpp
+
+${OBJECTDIR}/states/MainMenuState.o: states/MainMenuState.cpp 
+	${MKDIR} -p ${OBJECTDIR}/states
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/states/MainMenuState.o states/MainMenuState.cpp
+
+${OBJECTDIR}/states/PiskvorkyState.o: states/PiskvorkyState.cpp 
+	${MKDIR} -p ${OBJECTDIR}/states
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/states/PiskvorkyState.o states/PiskvorkyState.cpp
+
+${OBJECTDIR}/states/SettingsState.o: states/SettingsState.cpp 
+	${MKDIR} -p ${OBJECTDIR}/states
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/states/SettingsState.o states/SettingsState.cpp
 
 # Subprojects
 .build-subprojects:

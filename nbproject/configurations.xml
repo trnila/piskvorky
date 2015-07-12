@@ -4,7 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>Game.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -13,9 +12,35 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="graphics" displayName="graphics" projectFiles="true">
+        <itemPath>graphics/CheckBox.cpp</itemPath>
+        <itemPath>graphics/CheckBox.h</itemPath>
+        <itemPath>graphics/Component.cpp</itemPath>
+        <itemPath>graphics/Component.h</itemPath>
+        <itemPath>graphics/Container.cpp</itemPath>
+        <itemPath>graphics/Container.h</itemPath>
+        <itemPath>graphics/Font.cpp</itemPath>
+        <itemPath>graphics/Font.h</itemPath>
+        <itemPath>graphics/Input.cpp</itemPath>
+        <itemPath>graphics/Input.h</itemPath>
+        <itemPath>graphics/Text.cpp</itemPath>
+        <itemPath>graphics/Text.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="states" displayName="states" projectFiles="true">
+        <itemPath>states/AbstractGameState.cpp</itemPath>
+        <itemPath>states/AbstractGameState.h</itemPath>
+        <itemPath>states/MainMenuState.cpp</itemPath>
+        <itemPath>states/MainMenuState.h</itemPath>
+        <itemPath>states/PiskvorkyState.cpp</itemPath>
+        <itemPath>states/PiskvorkyState.h</itemPath>
+        <itemPath>states/SettingsState.cpp</itemPath>
+        <itemPath>states/SettingsState.h</itemPath>
+      </logicalFolder>
       <itemPath>Game.cpp</itemPath>
+      <itemPath>Game.h</itemPath>
       <itemPath>Gfx.cpp</itemPath>
       <itemPath>Gfx.h</itemPath>
+      <itemPath>Makefile</itemPath>
       <itemPath>Root.cpp</itemPath>
       <itemPath>Root.h</itemPath>
       <itemPath>main.cpp</itemPath>
@@ -32,6 +57,10 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>graphics</Elem>
+    <Elem>states</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
@@ -60,11 +89,53 @@
       </item>
       <item path="Gfx.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="Makefile" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="Root.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Root.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="graphics/CheckBox.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/CheckBox.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Component.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Component.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Container.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Container.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Font.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Font.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Input.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Text.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Text.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/AbstractGameState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/AbstractGameState.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="states/MainMenuState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/MainMenuState.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="states/PiskvorkyState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/PiskvorkyState.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="states/SettingsState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/SettingsState.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -95,11 +166,53 @@
       </item>
       <item path="Gfx.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="Makefile" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="Root.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Root.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="graphics/CheckBox.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/CheckBox.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Component.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Component.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Container.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Container.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Font.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Font.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Input.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graphics/Text.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="graphics/Text.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/AbstractGameState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/AbstractGameState.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="states/MainMenuState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/MainMenuState.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="states/PiskvorkyState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/PiskvorkyState.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="states/SettingsState.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="states/SettingsState.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
