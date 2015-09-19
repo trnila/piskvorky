@@ -13,6 +13,8 @@ Window::Window(int width, int height): width(width), height(height) {
 		SDL_Quit();
 		throw WindowCreationException(SDL_GetError());
 	}
+
+	font = new Font(renderer, "/usr/share/fonts/TTF/Vera.ttf");
 }
 
 Window::~Window() {

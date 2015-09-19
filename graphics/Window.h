@@ -2,6 +2,7 @@
 #define	WINDOW_H
 #include <stdexcept>
 #include <SDL.h>
+#include "Font.h"
 
 class Window {
 public:
@@ -23,11 +24,17 @@ public:
 	void setTitle(std::string title) {
 		SDL_SetWindowTitle(window, title.c_str());
 	}
+
+	Font * getFont() {
+		return font;
+	}
 private:
 	int width;
 	int height;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
+
+	Font *font;
 };
 
 class WindowCreationException: public std::exception {

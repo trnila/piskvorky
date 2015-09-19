@@ -23,6 +23,8 @@ public:
 	
 	virtual void render() = 0;
 	void injectEvent(const SDL_Event &evt);
+
+	virtual void setPosition(int x, int y);
 		
 	std::vector<std::function<void()>> onClick;
 	std::vector<std::function<void()>> onMouseMoveIn;

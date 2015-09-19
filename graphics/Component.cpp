@@ -41,3 +41,8 @@ void Component::injectEvent(const SDL_Event &evt) {
 		}
 	}
 }
+
+void Component::setPosition(int x, int y) {
+	rect.x = x;
+	rect.y = y;
+}

@@ -1,7 +1,7 @@
 #include "SettingsState.h"
 
-SettingsState::SettingsState(Window &window, Font &font): AbstractGameState(window), container(window) {
-	Text *header = new Text(window, &font, TextType::Variable);
+SettingsState::SettingsState(Window &window) : AbstractGameState(window), container(window) {
+	Text *header = new Text(window, TextType::Variable);
 	header->setText("Settings");
 	header->setPosition({100, 100});
 	header->setColor({0, 0, 0});

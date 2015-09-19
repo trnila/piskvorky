@@ -31,7 +31,7 @@ set(SOURCE_FILES
     Game.h
     Gfx.cpp
     Gfx.h
-    main.cpp Player.cpp Player.h MoveListener.h NormalPlayer.cpp NormalPlayer.h Action.h Action.cpp Action.h AIPlayer.cpp AIPlayer.h NetworkPlayer.cpp NetworkPlayer.h)
+    main.cpp Player.cpp Player.h MoveListener.h NormalPlayer.cpp NormalPlayer.h Action.h Action.cpp Action.h AIPlayer.cpp AIPlayer.h NetworkPlayer.cpp NetworkPlayer.h Time.cpp Time.h StatsPanel.cpp StatsPanel.h)
 
 add_executable(piskvorky ${SOURCE_FILES})
 

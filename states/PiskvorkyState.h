@@ -5,6 +5,8 @@
 #include "AbstractGameState.h"
 #include "../Player.h"
 #include "../NetworkPlayer.h"
+#include "../Time.h"
+#include "../StatsPanel.h"
 
 class PiskvorkyState: public AbstractGameState, MoveListener {
 public:
@@ -32,6 +34,8 @@ private:
 	SDL_Point mouse;
     Player *human;
     Player *oponent;
+
+	StatsPanel statsPanel;
 };
 
 #endif	/* PISKVORKYSTATE_H */

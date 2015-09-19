@@ -6,9 +6,10 @@
 
 class Input: public Component {
 public:
-	Input(Window& root, Font *font, SDL_Rect rect);
+	Input(Window &root, SDL_Rect rect);
 	virtual ~Input();
 	void render();
+	void setValue(std::string value);
 	
 private:
 	bool editing;

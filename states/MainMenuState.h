@@ -9,7 +9,7 @@
 
 class MainMenuState: public AbstractGameState {
 public:
-	MainMenuState(Window &window, Font &font);
+	MainMenuState(Window &window);
 	void renderOneFrame();
 	void injectEvent(SDL_Event &evt);
 	

@@ -4,18 +4,19 @@
 #include "../NetworkPlayer.h"
 #include "../graphics/Text.h"
 
-PiskvorkyState::PiskvorkyState(Window &window): AbstractGameState(window), game(Game(20, 4)) {
+PiskvorkyState::PiskvorkyState(Window &window): AbstractGameState(window), game(Game(20, 4)), statsPanel(window) {
 	cross = loadAsTexture(window.getRenderer(), "cross.png");
 	circle = loadAsTexture(window.getRenderer(), "circle.png");
 	if(cross == NULL || circle == NULL) {
-		std::cout << "cross or circle missing!";
-		exit(1);
+		throw std::runtime_error("cross or circle missing!");
 	}
 
-	cellSize = window.getWidth() / game.getCount();
+	cellSize = (window.getWidth() - 200) / game.getCount();
 
     human = new NormalPlayer(CellType::Circle , cellSize);
 	human->attach(this);
+
+	statsPanel.setPosition(window.getWidth() - 200, 0);
 }
 
 void PiskvorkyState::newOponent(Player *oponent) {
@@ -48,19 +49,19 @@ void PiskvorkyState::renderOneFrame() {
 	Font f(window.getRenderer(), "/usr/share/fonts/TTF/Vera.ttf");
 
 	if(!human->isAvailable()) {
-		Text text(window, &f, TextType::Fixed);
+		Text text(window, TextType::Fixed);
 		text.setText("Waiting for player1");
 		text.render();
 	}
 
 	if(!oponent->isAvailable()) {
-		Text text(window, &f, TextType::Fixed);
+		Text text(window, TextType::Fixed);
 		text.setPosition({100, 100});
 		text.setText("Waiting for player2");
 		text.render();
 	}
 
-	Text text(window, &f, TextType::Fixed);
+	Text text(window, TextType::Fixed);
 	text.setPosition({0, 500});
 	text.setText(human->getCellType() == game.getNextType() ?  "Your turn" : "Their turn");
 	text.render();
@@ -134,6 +135,8 @@ void PiskvorkyState::renderOneFrame() {
 
 		game.reset();
 	}
+
+	statsPanel.render();
 
 	SDL_Rect r = {mouse.x - 10, mouse.y - 10, 20, 20};
 	SDL_RenderCopy(window.getRenderer(), game.getNextType() == CellType::Cross ? cross : circle, NULL, &r);

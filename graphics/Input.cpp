@@ -1,6 +1,6 @@
 #include "Input.h"
 
-Input::Input(Window &window, Font *font, SDL_Rect rect): Component(window) {
+Input::Input(Window &window, SDL_Rect rect) : Component(window) {
 	this->rect = rect;
 
 	editing = false;
@@ -8,7 +8,7 @@ Input::Input(Window &window, Font *font, SDL_Rect rect): Component(window) {
 	blink = 0;
 	counter = 0;
 
-	text = new Text(window, font, TextType::Fixed);
+	text = new Text(window, TextType::Fixed);
 	text->setRect(rect);
 	text->setColor({255, 0, 0});
 	text->setText("Daniel");
@@ -75,4 +75,8 @@ void Input::render() {
 			);
 		}
 	}
+}
+
+void Input::setValue(std::string value) {
+	text->setText(value);
 }

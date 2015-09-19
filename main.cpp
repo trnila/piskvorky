@@ -2,19 +2,11 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDL/SDL_events.h>
-#include <SDL/SDL_image.h>
 #include "states/AbstractGameState.h"
 #include "states/SettingsState.h"
 #include "states/MainMenuState.h"
 #include "states/PiskvorkyState.h"
-#include "Gfx.h"
-#include "Game.h"
-#include "graphics/Window.h"
-#include "NetworkPlayer.h"
 #include <sstream>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_keycode.h>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
@@ -45,12 +37,9 @@ int main(int argc, char** argv) {
 	
 	
 	Window window(800, 600);
-
-	Font f(window.getRenderer(), "/usr/share/fonts/TTF/Vera.ttf");
-		
-	MainMenuState mainMenu(window, f);
+	MainMenuState mainMenu(window);
 	PiskvorkyState gameScene(window);
-	SettingsState settingsState(window, f);
+	SettingsState settingsState(window);
 	
 	SDL_Event evt;
 

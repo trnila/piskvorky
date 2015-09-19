@@ -1,7 +1,7 @@
 #include "Text.h"
 
-Text::Text(Window &window, Font *font, TextType type): Component(window) {
-	this->font = font;
+Text::Text(Window &window, TextType type) : Component(window) {
+	this->font = window.getFont();
 	fontSize = 15;
 
 	maxRect = rect = {0, 0, 0, 0};
