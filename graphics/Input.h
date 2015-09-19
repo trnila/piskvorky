@@ -6,16 +6,16 @@
 
 class Input: public Component {
 public:
-	Input(Window &root, SDL_Rect rect);
+	Input(Component *root);
 	virtual ~Input();
-	void render();
+	void render(Window &window);
 	void setValue(std::string value);
-	
+
+	Text *text;
 private:
 	bool editing;
-	Text *text;
 	int counter;
-	bool blink;	
+	bool blink;
 };
 
 

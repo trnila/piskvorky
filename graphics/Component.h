@@ -6,44 +6,44 @@
 
 class Component {
 public:
-	Component(Window &window);
+	Component(Component *parent);
 	virtual ~Component();
 		
-	bool isVisible() {
-		return visible;
-	}
+	bool isVisible();
+	void setVisible(bool visible);
+
+	void setPosition(int x, int y);
+	void setDimension(int width, int height);
+	void setBackground(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+	void setBorder(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+	int getWidth();
+	int getHeight();
 	
-	void setVisible(bool visible) {
-		this->visible = visible;
-	}	
-	
-	const SDL_Rect& getRect() {
-		return rect;
-	}
-	
-	virtual void render() = 0;
+	virtual void render(Window &window);
 	void injectEvent(const SDL_Event &evt);
 
-	virtual void setPosition(int x, int y);
-		
 	std::vector<std::function<void()>> onClick;
 	std::vector<std::function<void()>> onMouseMoveIn;
 	std::vector<std::function<void()>> onMouseMoveOut;
 	std::vector<std::function<void()>> onBlur;
 	std::vector<std::function<void(const SDL_Event &evt)>> onKeyDown;
 	std::vector<std::function<void(const SDL_Event &evt)>> onTextInput;
-		
+
 protected:
-	Window &window;
+	Component *parent;
 	bool visible;
-	SDL_Rect rect;
-	
 	bool mousedIn;
 	bool focused;
+
+	SDL_Color background;
+	SDL_Color borderColor;
+	SDL_Point position;
+
+	int width, height;
 	
-	bool match(int x, int y, SDL_Rect rect) {
-		return x > rect.x && x < (rect.x + rect.w) && y > rect.y && y < (rect.y + rect.h);
-	}	
+	bool match(int x, int y);
+	const SDL_Point& getPosition();
+	SDL_Point getAbsolutePosition();
 };
 
 #endif	/* COMPONENT_H */

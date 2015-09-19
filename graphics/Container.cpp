@@ -1,6 +1,6 @@
 #include "Container.h"
 
-Container::Container(Window &window): Component(window) {}
+Container::Container(Component *parent): Component(parent) {}
 Container::~Container() {
 	for(Component* component : components) {
 		delete component;
@@ -11,10 +11,11 @@ void Container::addComponent(Component *component) {
 	components.push_back(component);
 }
 	
-void Container::render() {	
+void Container::render(Window &window) {
+	Component::render(window);
 	for(Component* component : components) {
 		if(component->isVisible()) {
-			component->render();
+			component->render(window);
 		}
 	}
 }

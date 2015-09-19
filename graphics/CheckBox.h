@@ -5,11 +5,11 @@
 
 class CheckBox: public Component {
 public:
-	CheckBox(Window &window);
-	void setPosition(SDL_Point point);
+	CheckBox(Component *component);
+
 	void setChecked(bool checked = true);
 	bool isChecked();
-	void render();
+	void render(Window &window);
 
 private:
 	SDL_Texture *emptyTexture;

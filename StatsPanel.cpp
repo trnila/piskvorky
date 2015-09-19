@@ -1,7 +1,7 @@
 #include "StatsPanel.h"
-StatsPanel::StatsPanel(Window &window) : Component(window), time(window) { }
+StatsPanel::StatsPanel(Component *window) : Component(window), time(NULL) { }
 
-void StatsPanel::render() {
-	time.setPosition(getRect().x, getRect().y);
-	time.render();
+void StatsPanel::render(Window &window) {
+	//time.setPosition(getRect().x, getRect().y);
+	time.render(window);
 }

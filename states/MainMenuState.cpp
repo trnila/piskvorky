@@ -1,27 +1,38 @@
 #include "MainMenuState.h"
+#include "../graphics/Text.h"
+#include "../graphics/Input.h"
+#include "AbstractGameState.h"
 
-MainMenuState::MainMenuState(Window &window) : AbstractGameState(window), container(window){
-	Text *header = new Text(window, TextType::Variable);
+MainMenuState::MainMenuState(Window &window) : AbstractGameState(window), container(nullptr){
+	container.setDimension(window.getWidth(), window.getHeight());
+	container.setBackground(245, 245, 245, 255);
+
+	Text *header = new Text(&container);
 	header->setText("Piskvorky");
-	header->setPosition({100, 100});
-	header->setColor({0, 0, 0});
+	header->setPosition(100, 100);
+	header->setFontSize(40);
+	header->setColor({255, 0, 0});
 
-	Text *newGame = new Text(window, TextType::Variable);
+	Text *newGame = new Text(&container);
 	newGame->setText("new game");
-	newGame->setPosition({100, 200});
+	newGame->setPosition(100, 200);
 	newGame->setColor({0, 0, 255});
 
-	Text *settings = new Text(window, TextType::Variable);
+	Text *settings = new Text(&container);
 	settings->setText("Settings");
-	settings->setPosition({100, 300});
+	settings->setPosition(100, 250);
 	settings->setColor({0, 0, 255});
 
-	Text *quitBtn = new Text(window, TextType::Variable);
+	Text *quitBtn = new Text(&container);
 	quitBtn->setText("Quit");
-	quitBtn->setPosition({100, 400});
+	quitBtn->setPosition(100, 300);
 	quitBtn->setColor({0, 0, 255});
 
-	Input *i = new Input(window, {400, 400, 100, 20});
+	Input *i = new Input(&container);
+	i->setPosition(300, 200);
+	i->setDimension(100, 20);
+	i->setBackground(0, 255, 0, 255);
+	i->setBorder(255, 0, 0, 255);
 	i->setValue("test");
 
 	newGame->onClick.push_back([&]() ->  void {
@@ -58,14 +69,11 @@ MainMenuState::MainMenuState(Window &window) : AbstractGameState(window), contai
 	container.addComponent(newGame);
 	container.addComponent(settings);
 	container.addComponent(quitBtn);
-	container.addComponent(i);		
+	container.addComponent(i);
 }
 
 void MainMenuState::renderOneFrame() {
-	SDL_SetRenderDrawColor(window.getRenderer(), 255, 255, 255, 255);
-	SDL_RenderClear(window.getRenderer());
-
-	container.render();
+	container.render(window);
 }
 
 void MainMenuState::injectEvent(SDL_Event &evt) {

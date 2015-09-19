@@ -3,29 +3,27 @@
 #include "Component.h"
 #include "Font.h"
 
-enum class TextType {Variable, Fixed};
-
 class Text: public Component {
 public:
-	Text(Window &window, TextType type);
+	Text(Component *parent);
 	void setText(const std::string &text);
 	std::string& getText();
-	
-	void setPosition(const SDL_Point &position);
-	void setRect(const SDL_Rect rect);
+
 	void setColor(const SDL_Color &color);
 	
 	void setFontSize(int size);
-	void render();
-	
+	void render(Window &window);
+
+	void popLastCharacter();
+
+	SDL_Rect getCoveredDimension();
+
 private:
-	Font *font;
 	std::string text;
 	SDL_Color color;
 	int fontSize;
-	TextType textType;
-	
-	SDL_Rect maxRect;
+
+	SDL_Rect coveredDimension;
 };
 
 #endif	/* TEXT_H */

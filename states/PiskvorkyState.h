@@ -7,6 +7,7 @@
 #include "../NetworkPlayer.h"
 #include "../Time.h"
 #include "../StatsPanel.h"
+#include "../graphics/Container.h"
 
 class PiskvorkyState: public AbstractGameState, MoveListener {
 public:
@@ -35,7 +36,7 @@ private:
     Player *human;
     Player *oponent;
 
-	StatsPanel statsPanel;
+	Container statsPanel;
 };
 
 #endif	/* PISKVORKYSTATE_H */

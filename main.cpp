@@ -77,6 +77,7 @@ int main(int argc, char** argv) {
 	}
 
 
+	SDL_SetRenderDrawBlendMode(window.getRenderer(), SDL_BLENDMODE_BLEND);
 	while(nextState != GameStateType::Quit) {
 		AbstractGameState *state;
 		

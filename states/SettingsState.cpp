@@ -1,13 +1,13 @@
 #include "SettingsState.h"
+#include "../graphics/CheckBox.h"
 
-SettingsState::SettingsState(Window &window) : AbstractGameState(window), container(window) {
-	Text *header = new Text(window, TextType::Variable);
+SettingsState::SettingsState(Window &window) : AbstractGameState(window), container(NULL) {
+	Text *header = new Text(&container);
 	header->setText("Settings");
-	header->setPosition({100, 100});
 	header->setColor({0, 0, 0});
 
-	CheckBox *box = new CheckBox(window);
-	box->setPosition({100, 200});
+	CheckBox *box = new CheckBox(nullptr);
+	box->setPosition(100, 200);
 
 
 	container.addComponent(header);		
@@ -33,5 +33,5 @@ void SettingsState::renderOneFrame() {
 	SDL_SetRenderDrawColor(window.getRenderer(), 255, 255, 255, 255);
 	SDL_RenderClear(window.getRenderer());
 
-	container.render();
+	container.render(window);
 }

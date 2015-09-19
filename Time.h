@@ -7,16 +7,14 @@
 
 class Time: public Component {
 public:
-	Time(Window &window);
+	Time(Component *parent);
 	void start();
 
-	virtual void render();
+	virtual void render(Window &window);
 
 private:
 	Text text;
 	std::chrono::system_clock::time_point started;
-public:
-	virtual void setPosition(int x, int y) override;
 };
 
 

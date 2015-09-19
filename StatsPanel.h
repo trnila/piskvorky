@@ -7,9 +7,9 @@
 
 class StatsPanel: public Component {
 public:
-	StatsPanel(Window &window);
+	StatsPanel(Component *window);
 
-	virtual void render();
+	virtual void render(Window &window);
 
 private:
 	Time time;

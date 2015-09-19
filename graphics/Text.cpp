@@ -1,11 +1,9 @@
+#include "Input.h"
 #include "Text.h"
 
-Text::Text(Window &window, TextType type) : Component(window) {
-	this->font = window.getFont();
+Text::Text(Component *parent) : Component(parent) {
 	fontSize = 15;
-
-	maxRect = rect = {0, 0, 0, 0};
-	textType = type;
+	coveredDimension = {0, 0, 0, 0};
 }
 
 void Text::setText(const std::string &text) {
@@ -16,15 +14,6 @@ std::string& Text::getText() {
 	return text;
 }
 
-void Text::setPosition(const SDL_Point &position) {
-	maxRect.x = position.x;
-	maxRect.y = position.y;
-}
-
-void Text::setRect(const SDL_Rect rect) {
-	this->maxRect = rect;
-}
-
 void Text::setColor(const SDL_Color &color) {
 	this->color = color;
 }
@@ -33,7 +22,26 @@ void Text::setFontSize(int size) {
 	this->fontSize = size;
 }
 
-void Text::render() {
-	rect = font->write(text.c_str(), maxRect, color, fontSize);
+void Text::render(Window &window) {
+	Component::render(window);
+
+	coveredDimension.x = getAbsolutePosition().x;
+	coveredDimension.y = getAbsolutePosition().y;
+
+	coveredDimension = window.getFont()->write(text.c_str(), coveredDimension, color, fontSize);
 }
 
+void Text::popLastCharacter() {
+	while(text.length() > 0) {
+		char c = text.back();
+		text.pop_back();
+
+		if((c & 0xC0) != 0x80) {
+			break;
+		}
+	}
+}
+
+SDL_Rect Text::getCoveredDimension() {
+	return coveredDimension;
+}

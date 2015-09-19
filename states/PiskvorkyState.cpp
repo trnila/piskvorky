@@ -4,7 +4,7 @@
 #include "../NetworkPlayer.h"
 #include "../graphics/Text.h"
 
-PiskvorkyState::PiskvorkyState(Window &window): AbstractGameState(window), game(Game(20, 4)), statsPanel(window) {
+PiskvorkyState::PiskvorkyState(Window &window): AbstractGameState(window), game(Game(20, 4)), statsPanel(nullptr) {
 	cross = loadAsTexture(window.getRenderer(), "cross.png");
 	circle = loadAsTexture(window.getRenderer(), "circle.png");
 	if(cross == NULL || circle == NULL) {
@@ -16,7 +16,21 @@ PiskvorkyState::PiskvorkyState(Window &window): AbstractGameState(window), game(
     human = new NormalPlayer(CellType::Circle , cellSize);
 	human->attach(this);
 
+	statsPanel.setBackground(244, 252, 178, 200);
 	statsPanel.setPosition(window.getWidth() - 200, 0);
+	statsPanel.setDimension(200, window.getHeight());
+
+	Time *time = new Time(&statsPanel);
+	time->setPosition(100, 100);
+
+	Text *a = new Text(&statsPanel);
+	a->setText("nazdar");
+	a->setPosition(0, 0);
+	a->setFontSize(30);
+	a->setColor({255, 0, 255});
+
+	statsPanel.addComponent(time);
+	statsPanel.addComponent(a);
 }
 
 void PiskvorkyState::newOponent(Player *oponent) {
@@ -46,25 +60,21 @@ void PiskvorkyState::renderOneFrame() {
 	SDL_SetRenderDrawColor(window.getRenderer(), 255, 255, 255, 255);
 	SDL_RenderClear(window.getRenderer());
 
-	Font f(window.getRenderer(), "/usr/share/fonts/TTF/Vera.ttf");
-
 	if(!human->isAvailable()) {
-		Text text(window, TextType::Fixed);
+		Text text(nullptr);
 		text.setText("Waiting for player1");
-		text.render();
+		text.render(window);
 	}
 
 	if(!oponent->isAvailable()) {
-		Text text(window, TextType::Fixed);
-		text.setPosition({100, 100});
+		Text text(nullptr);
 		text.setText("Waiting for player2");
-		text.render();
+		text.render(window);
 	}
 
-	Text text(window, TextType::Fixed);
-	text.setPosition({0, 500});
+	Text text(nullptr);
 	text.setText(human->getCellType() == game.getNextType() ?  "Your turn" : "Their turn");
-	text.render();
+	text.render(window);
 
 	// redraw lines
 	for(int i = 0; i < game.getCount(); i++) {
@@ -136,7 +146,7 @@ void PiskvorkyState::renderOneFrame() {
 		game.reset();
 	}
 
-	statsPanel.render();
+	statsPanel.render(window);
 
 	SDL_Rect r = {mouse.x - 10, mouse.y - 10, 20, 20};
 	SDL_RenderCopy(window.getRenderer(), game.getNextType() == CellType::Cross ? cross : circle, NULL, &r);

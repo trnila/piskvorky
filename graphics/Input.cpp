@@ -1,17 +1,12 @@
 #include "Input.h"
 
-Input::Input(Window &window, SDL_Rect rect) : Component(window) {
-	this->rect = rect;
-
+Input::Input(Component *parent) : Component(parent) {
 	editing = false;
 
 	blink = 0;
 	counter = 0;
 
-	text = new Text(window, TextType::Fixed);
-	text->setRect(rect);
-	text->setColor({255, 0, 0});
-	text->setText("Daniel");
+	text = new Text(this);
 
 	onMouseMoveIn.push_back([&]() -> void {
 		//root.setTextCursor();
@@ -33,11 +28,13 @@ Input::Input(Window &window, SDL_Rect rect) : Component(window) {
 
 	onKeyDown.push_back([&](const SDL_Event &evt) -> void {
 		if(editing) {
-			if(evt.key.keysym.sym == SDLK_BACKSPACE) {
-				if(text->getText().length() > 0) {
-					text->getText().pop_back();
-				}
-			}	
+			switch(evt.key.keysym.sym) {
+				case SDLK_BACKSPACE:
+					text->popLastCharacter();
+					break;
+				case SDLK_LEFT:
+					break;
+			}
 		}
 	});
 
@@ -52,11 +49,10 @@ Input::~Input() {
 	delete text;
 }
 
-void Input::render() {
-	SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 0);
-	SDL_RenderDrawRect(window.getRenderer(), &rect);
+void Input::render(Window &window) {
+	Component::render(window);
 
-	text->render();
+	text->render(window);
 
 	if(editing) {
 		if(counter++ >= 10) {	
@@ -65,13 +61,17 @@ void Input::render() {
 		}
 
 		if(blink) {
-			SDL_Rect r = text->getRect();
+			SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
+
+			int x = getAbsolutePosition().x;
+			int y = getAbsolutePosition().y;
+
 			SDL_RenderDrawLine(
 				window.getRenderer(), 
-				r.x + r.w + 10,
-				r.y,
-				r.x + r.w + 10,
-				r.y + r.h
+				x + text->getCoveredDimension().w,
+				y,
+				x + text->getCoveredDimension().w,
+				y + getHeight()
 			);
 		}
 	}

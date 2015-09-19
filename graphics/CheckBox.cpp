@@ -1,20 +1,14 @@
 #include "CheckBox.h"
 
-CheckBox::CheckBox(Window &window): Component(window), checked(false) {
-	emptyTexture = loadAsTexture(window.getRenderer(), "tick.png");
-	checkedTexture = loadAsTexture(window.getRenderer(), "tick-checked.png");
+CheckBox::CheckBox(Component *component): Component(component), checked(false) {
+//	emptyTexture = loadAsTexture(component.getRenderer(), "tick.png");
+//	checkedTexture = loadAsTexture(component.getRenderer(), "tick-checked.png");
 
-	rect.w = 20;
-	rect.h = 20;
+	setDimension(20, 20);
 
 	onClick.push_back([&]() -> void {
 		checked = !checked;
 	});
-}
-
-void CheckBox::setPosition(SDL_Point point) {
-	rect.x = point.x;
-	rect.y = point.y;
 }
 
 void CheckBox::setChecked(bool checked) {
@@ -25,6 +19,7 @@ bool CheckBox::isChecked() {
 	return checked;
 }
 
-void CheckBox::render() {
-	SDL_RenderCopy(window.getRenderer(), checked ? checkedTexture : emptyTexture, NULL, &rect);
+void CheckBox::render(Window &window) {
+	throw std::runtime_error("Not implemented");
+	//SDL_RenderCopy(window.getRenderer(), checked ? checkedTexture : emptyTexture, NULL, &rect);
 }

@@ -6,11 +6,12 @@
 
 class Container: public Component {
 public:
-	Container(Window &window);
+	Container(Component *parent);
 	~Container();
 	
 	void addComponent(Component *component);
-	void render();
+
+	virtual void render(Window &window);
 	void injectEvent(const SDL_Event &evt);
 		
 private:

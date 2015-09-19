@@ -34,7 +34,7 @@ SDL_Rect Font::write(const char *msg, const SDL_Rect &rect, const SDL_Color &col
 		return {0, 0, 0, 0};
 	}
 
-	SDL_Surface *surface = TTF_RenderText_Blended(getFont(fontSize), msg, color);
+	SDL_Surface *surface = TTF_RenderUTF8_Blended(getFont(fontSize), msg, color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
 	SDL_Rect r;

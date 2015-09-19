@@ -3,7 +3,7 @@
 #include <iomanip>
 #include "Time.h"
 
-Time::Time(Window &window) : Component(window), text(window, TextType::Fixed) {
+Time::Time(Component *parent) : Component(parent), text(parent) {
 	start();
 }
 
@@ -12,13 +12,7 @@ void Time::start() {
 	started = std::chrono::system_clock::now();
 }
 
-
-void Time::setPosition(int x, int y) {
-	Component::setPosition(x, y);
-	text.setPosition({x, y});
-}
-
-void Time::render() {
+void Time::render(Window &window) {
 	auto totalSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - started).count();
 
 	int minutes = totalSeconds / 60;
@@ -27,5 +21,5 @@ void Time::render() {
 	std::ostringstream os;
 	os << minutes << ":" << std::setfill('0') << std::setw(2) << seconds;
 	text.setText(os.str());
-	text.render();
+	text.render(window);
 }
