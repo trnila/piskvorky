@@ -2,7 +2,7 @@
 
 Text::Text(Window &window, Font *font, TextType type): Component(window) {
 	this->font = font;
-	fontSize = 0;
+	fontSize = 15;
 
 	maxRect = rect = {0, 0, 0, 0};
 	textType = type;

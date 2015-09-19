@@ -45,12 +45,7 @@ void PiskvorkyState::renderOneFrame() {
 	SDL_SetRenderDrawColor(window.getRenderer(), 255, 255, 255, 255);
 	SDL_RenderClear(window.getRenderer());
 
-	TTF_Font *font = TTF_OpenFont("/usr/share/fonts/TTF/Vera.ttf", 50);
-	if (font == nullptr){
-		std::cout << "OPENFONT" << TTF_GetError();
-	}
-
-	Font f(window.getRenderer(), font);
+	Font f(window.getRenderer(), "/usr/share/fonts/TTF/Vera.ttf");
 
 	if(!human->isAvailable()) {
 		Text text(window, &f, TextType::Fixed);

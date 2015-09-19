@@ -45,15 +45,8 @@ int main(int argc, char** argv) {
 	
 	
 	Window window(800, 600);
-	
-	TTF_Font *font = TTF_OpenFont("/usr/share/fonts/TTF/Vera.ttf", 50);
-	if (font == nullptr){
-		std::cout << "OPENFONT" << TTF_GetError();
-		return 0;
-	}
-	
-	
-	Font f(window.getRenderer(), font);
+
+	Font f(window.getRenderer(), "/usr/share/fonts/TTF/Vera.ttf");
 		
 	MainMenuState mainMenu(window, f);
 	PiskvorkyState gameScene(window);

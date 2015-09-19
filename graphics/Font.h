@@ -1,33 +1,22 @@
 #ifndef FONT_H
 #define	FONT_H
+
+#include <unordered_map>
 #include <SDL_ttf.h>
 
 class Font {
-private:
-	TTF_Font *font;
-	SDL_Texture *texture;
-	SDL_Renderer *renderer;
-	
-	/* font height */
-	int height;
-        
-	/* temp bitmap height */
-	int bitmapHeight;
-
-	/* Spacing between letters */
-	int spacing;
-        
-	/* width of the widest font */
-	int maxWidth;
-	
-	/* an array of invidual character width */
-	int widths['~' - ' '];
 public:
-	Font(SDL_Renderer *renderer, TTF_Font *font);
+	Font(SDL_Renderer *renderer, const char *path);
 	~Font();
-	
-	void build();
+
 	SDL_Rect write(const char*, const SDL_Rect& rect, const SDL_Color &color, int fontSize = 0);
+	TTF_Font* getFont(int size);
+	TTF_Font* createFont(int size);
+
+private:
+	SDL_Renderer *renderer;
+	const char* path;
+	std::unordered_map<int, TTF_Font*> fonts;
 };
 
 #endif	/* FONT_H */
