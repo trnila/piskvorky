@@ -2,6 +2,7 @@ nbproject/private
 dist/
 build/
 .dep.inc
+.idea
 
 CMakeCache.txt
 CMakeFiles
