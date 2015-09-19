@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 project(piskvorky)
 
+set(Boost_USE_STATIC_LIBS ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES
@@ -30,15 +31,18 @@ set(SOURCE_FILES
     Game.h
     Gfx.cpp
     Gfx.h
-    main.cpp)
+    main.cpp Player.cpp Player.h MoveListener.h NormalPlayer.cpp NormalPlayer.h Action.h Action.cpp Action.h AIPlayer.cpp AIPlayer.h NetworkPlayer.cpp NetworkPlayer.h)
 
 add_executable(piskvorky ${SOURCE_FILES})
 
 INCLUDE(FindPkgConfig)
-
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2_IMAGE REQUIRED SDL2_image)
 PKG_SEARCH_MODULE(SDL2_TTF REQUIRED SDL2_ttf)
+find_package( Boost REQUIRED COMPONENTS program_options )
 
-INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(piskvorky ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+INCLUDE_DIRECTORIES(
+	${SDL2_INCLUDE_DIRS}
+	${Boost_INCLUDE_DIRS}
+)
+TARGET_LINK_LIBRARIES(piskvorky ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${SDL2_TTF_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})

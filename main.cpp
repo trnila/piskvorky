@@ -11,11 +11,13 @@
 #include "Gfx.h"
 #include "Game.h"
 #include "graphics/Window.h"
+#include "NetworkPlayer.h"
 #include <sstream>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keycode.h>
+#include <boost/program_options.hpp>
 
-
+namespace po = boost::program_options;
 int main(int argc, char** argv) {
 	srand(time(NULL));
 
@@ -58,16 +60,41 @@ int main(int argc, char** argv) {
 	SettingsState settingsState(window, f);
 	
 	SDL_Event evt;
-	
-	
-	Text fps(window, &f, TextType::Fixed);
-	fps.setColor({255, 0, 0});
-	fps.setPosition({0, 0});
-	
-	int fps_lasttime = SDL_GetTicks();
-	int fps_frames = 0;
-	
+
 	GameStateType nextState = GameStateType::MainMenu;
+
+	int port = 0;
+	std::string host;
+	po::options_description desc("Allowed options");
+	desc.add_options()
+			("help", "produce help message")
+			("port", po::value<int>(&port), "port")
+			("host", po::value<std::string>(&host), "host")
+			;
+
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::notify(vm);
+
+	if (vm.count("help")) {
+		std::cout << desc << "\n";
+		return 1;
+	}
+
+	if(port) {
+		if(host.length()) {
+			gameScene.setPlayer2(new NetworkPlayer(CellType::Circle, host, port));
+			gameScene.getPlayer1()->setCellType(CellType::Cross);
+			window.setTitle("client");
+		} else {
+			gameScene.setPlayer2(new NetworkPlayer(CellType::Cross, port));
+			window.setTitle("server");
+		}
+
+		nextState = GameStateType::Game;
+	}
+
+
 	while(nextState != GameStateType::Quit) {
 		AbstractGameState *state;
 		
@@ -97,19 +124,7 @@ int main(int argc, char** argv) {
 			}
 			
 			state->renderOneFrame();
-			
-			fps_frames++;
-			if (fps_lasttime < SDL_GetTicks() - 1*1000) {
-				fps_lasttime = SDL_GetTicks();
-				
-				std::stringstream out;
-				out << fps_frames;
-				
-				fps.setText(out.str());				
-				fps_frames = 0;
-			}
-			
-			fps.render();
+
 			SDL_RenderPresent(window.getRenderer());
 		}
 		

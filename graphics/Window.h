@@ -19,6 +19,10 @@ public:
 	int getHeight() {
 		return height;
 	}
+
+	void setTitle(std::string title) {
+		SDL_SetWindowTitle(window, title.c_str());
+	}
 private:
 	int width;
 	int height;

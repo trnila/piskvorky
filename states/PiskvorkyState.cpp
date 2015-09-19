@@ -1,4 +1,8 @@
 #include "PiskvorkyState.h"
+#include "../NormalPlayer.h"
+#include "../AIPlayer.h"
+#include "../NetworkPlayer.h"
+#include "../graphics/Text.h"
 
 PiskvorkyState::PiskvorkyState(Window &window): AbstractGameState(window), game(Game(20, 4)) {
 	cross = loadAsTexture(window.getRenderer(), "cross.png");
@@ -9,6 +13,12 @@ PiskvorkyState::PiskvorkyState(Window &window): AbstractGameState(window), game(
 	}
 
 	cellSize = window.getWidth() / game.getCount();
+
+    player1 = new NormalPlayer(CellType::Circle , cellSize);
+    player2 = new AIPlayer(CellType::Cross);
+	//player2 = new NetworkPlayer(CellType::Cross, "127.0.0.1", 12345);
+
+	player1->attach(this);
 }
 
 PiskvorkyState::~PiskvorkyState() {
@@ -26,27 +36,34 @@ void PiskvorkyState::deinit() {
 }
 
 
-void PiskvorkyState::injectEvent(SDL_Event& evt) {
-	if(evt.type == SDL_MOUSEBUTTONDOWN) {
-		int row = evt.motion.x / cellSize;
-		int col = evt.motion.y / cellSize;
-
-		game.step(row, col);
-	} else if(evt.type == SDL_QUIT) {
-		setQuit(GameStateType::Quit);
-	} else if(evt.type == SDL_MOUSEMOTION) {
-		mouse.x = evt.motion.x;
-		mouse.y = evt.motion.y;
-	} else if(evt.type == SDL_KEYDOWN) {
-		if(evt.key.keysym.sym == SDLK_ESCAPE) {
-			setQuit(GameStateType::MainMenu);
-		}
-	}
-}
-
 void PiskvorkyState::renderOneFrame() {
 	SDL_SetRenderDrawColor(window.getRenderer(), 255, 255, 255, 255);
 	SDL_RenderClear(window.getRenderer());
+
+	TTF_Font *font = TTF_OpenFont("/usr/share/fonts/TTF/Vera.ttf", 50);
+	if (font == nullptr){
+		std::cout << "OPENFONT" << TTF_GetError();
+	}
+
+	Font f(window.getRenderer(), font);
+
+	if(!player1->isAvailable()) {
+		Text text(window, &f, TextType::Fixed);
+		text.setText("Waiting for player1");
+		text.render();
+	}
+
+	if(!player2->isAvailable()) {
+		Text text(window, &f, TextType::Fixed);
+		text.setPosition({100, 100});
+		text.setText("Waiting for player2");
+		text.render();
+	}
+
+	Text text(window, &f, TextType::Fixed);
+	text.setPosition({0, 500});
+	text.setText(player1->getCellType() == game.getNextType() ?  "Your turn" : "Their turn");
+	text.render();
 
 	// redraw lines
 	for(int i = 0; i < game.getCount(); i++) {
@@ -120,4 +137,17 @@ void PiskvorkyState::renderOneFrame() {
 
 	SDL_Rect r = {mouse.x - 10, mouse.y - 10, 20, 20};
 	SDL_RenderCopy(window.getRenderer(), game.getNextType() == CellType::Cross ? cross : circle, NULL, &r);
+}
+
+void PiskvorkyState::injectEvent(SDL_Event &evt) {
+	if(evt.type == SDL_MOUSEMOTION) {
+		mouse.x = evt.motion.x;
+		mouse.y = evt.motion.y;
+	} else {
+		((NormalPlayer *) player1)->injectEvent(evt);
+	}
+}
+
+void PiskvorkyState::onMove(Action *action) {
+	action->handle(game);
 }

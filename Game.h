@@ -16,14 +16,13 @@ struct Win {
 class Game {
 public:	
 	Game(int count, int minRequired);
-	
 	~Game();
 	
 	void reset();	
 	bool step(int row, int col);	
 	CellType get(int row, int col);	
 	int getCount();	
-	int setMinRequired(int minRequired);	
+	int setMinRequired(int minRequired);
 	bool isWin();	
 	Win getWin();
 	CellType getNextType();
