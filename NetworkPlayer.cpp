@@ -41,22 +41,7 @@ perror("kokosu");
 		printf("%s:%d connected\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
 		for(;;) {
-			uint8_t command, x, y;
-			read(clientFd, &command, sizeof(command));
-
-			if(command == (uint8_t) Command::MOVE) {
-				read(clientFd, &x, sizeof(x));
-				read(clientFd, &y, sizeof(y));
-
-				printf("%d %d\n", x, y);
-
-				notifyAll(new MoveAction(*(this), x, y));
-
-			} else {
-				printf("Invalid command %d\n", command);
-			}
-
-			fflush(stdout);
+			parseNextCommand();
 		}
 
 	});
@@ -95,25 +80,32 @@ NetworkPlayer::NetworkPlayer(const CellType &cellType, std::string address, int 
 
 		clientFd = sockfd;
 		for(;;) {
-			uint8_t command, x, y;
-			read(sockfd, &command, sizeof(command));
-
-			if(command == (uint8_t) Command::MOVE) {
-				read(sockfd, &x, sizeof(x));
-				read(sockfd, &y, sizeof(y));
-
-				printf("%d %d\n", x, y);
-
-				notifyAll(new MoveAction(*(this), x, y));
-
-			} else {
-				printf("Invalid command %d\n", command);
-			}
-
-			fflush(stdout);
+			parseNextCommand();
 		}
 	});
 	thread.detach();
+}
+
+void NetworkPlayer::parseNextCommand() {
+	uint8_t command, x, y;
+	if(read(clientFd, &command, sizeof(command)) <= 0) {
+		notifyAll(new QuitAction(*this));
+		return;
+	}
+
+	if(command == (uint8_t) Command::MOVE) {
+		read(clientFd, &x, sizeof(x));
+		read(clientFd, &y, sizeof(y));
+
+		printf("%d %d\n", x, y);
+
+		notifyAll(new MoveAction(*(this), x, y));
+
+	} else {
+		printf("Invalid command %d\n", command);
+	}
+
+	fflush(stdout);
 }
 
 void NetworkPlayer::onMove(Action *action) {

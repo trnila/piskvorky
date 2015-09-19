@@ -83,11 +83,11 @@ int main(int argc, char** argv) {
 
 	if(port) {
 		if(host.length()) {
-			gameScene.setPlayer2(new NetworkPlayer(CellType::Circle, host, port));
+			gameScene.newOponent(new NetworkPlayer(CellType::Circle, host, port));
 			gameScene.getPlayer1()->setCellType(CellType::Cross);
 			window.setTitle("client");
 		} else {
-			gameScene.setPlayer2(new NetworkPlayer(CellType::Cross, port));
+			gameScene.newOponent(new NetworkPlayer(CellType::Cross, port));
 			window.setTitle("server");
 		}
 

@@ -15,3 +15,5 @@ void NormalPlayer::injectEvent(SDL_Event& evt) {
 		notifyAll(new QuitAction(*(this)));
 	}
 }
+
+void NormalPlayer::process() {}

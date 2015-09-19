@@ -14,11 +14,16 @@ PiskvorkyState::PiskvorkyState(Window &window): AbstractGameState(window), game(
 
 	cellSize = window.getWidth() / game.getCount();
 
-    player1 = new NormalPlayer(CellType::Circle , cellSize);
-    player2 = new AIPlayer(CellType::Cross);
-	//player2 = new NetworkPlayer(CellType::Cross, "127.0.0.1", 12345);
+    human = new NormalPlayer(CellType::Circle , cellSize);
+	human->attach(this);
+}
 
-	player1->attach(this);
+void PiskvorkyState::newOponent(Player *oponent) {
+	this->oponent = oponent;
+	this->oponent->attach(this);
+	human->attach((NetworkPlayer*) oponent);
+
+	game.reset();
 }
 
 PiskvorkyState::~PiskvorkyState() {
@@ -47,13 +52,13 @@ void PiskvorkyState::renderOneFrame() {
 
 	Font f(window.getRenderer(), font);
 
-	if(!player1->isAvailable()) {
+	if(!human->isAvailable()) {
 		Text text(window, &f, TextType::Fixed);
 		text.setText("Waiting for player1");
 		text.render();
 	}
 
-	if(!player2->isAvailable()) {
+	if(!oponent->isAvailable()) {
 		Text text(window, &f, TextType::Fixed);
 		text.setPosition({100, 100});
 		text.setText("Waiting for player2");
@@ -62,7 +67,7 @@ void PiskvorkyState::renderOneFrame() {
 
 	Text text(window, &f, TextType::Fixed);
 	text.setPosition({0, 500});
-	text.setText(player1->getCellType() == game.getNextType() ?  "Your turn" : "Their turn");
+	text.setText(human->getCellType() == game.getNextType() ?  "Your turn" : "Their turn");
 	text.render();
 
 	// redraw lines
@@ -144,10 +149,14 @@ void PiskvorkyState::injectEvent(SDL_Event &evt) {
 		mouse.x = evt.motion.x;
 		mouse.y = evt.motion.y;
 	} else {
-		((NormalPlayer *) player1)->injectEvent(evt);
+		((NormalPlayer *) human)->injectEvent(evt);
 	}
 }
 
 void PiskvorkyState::onMove(Action *action) {
 	action->handle(game);
+
+	if(QuitAction* v = dynamic_cast<QuitAction*>(action)) {
+		this->setQuit(GameStateType::MainMenu);
+	}
 }

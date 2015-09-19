@@ -14,32 +14,24 @@ public:
 	void init();
 	void deinit();
 
-	void setPlayer2(Player* player) {
-		player2 = player;
-		player2->attach(this);
-		player1->attach((NetworkPlayer*) player2);
-	}
-
 	Player* getPlayer1() {
-		return player1;
+		return human;
 	}
 
+	void newOponent(Player *oponent);
 
 private:
 	virtual void onMove(Action *action);
-
 	virtual void injectEvent(SDL_Event &evt) override;
-
     void renderOneFrame();
-	
-private:
+
 	SDL_Texture *cross;
 	SDL_Texture *circle;
 	Game game;
 	int cellSize;
 	SDL_Point mouse;
-    Player *player1;
-    Player *player2;
+    Player *human;
+    Player *oponent;
 };
 
 #endif	/* PISKVORKYSTATE_H */

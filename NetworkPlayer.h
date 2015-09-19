@@ -11,7 +11,6 @@ public:
 	NetworkPlayer(const CellType &cellType, std::string address, int port);
 	NetworkPlayer(const CellType &cellType, int port);
 
-
 	virtual bool isAvailable() override;
 
 private:
@@ -24,6 +23,8 @@ private:
 	int sockFd;
 	int clientFd;
 	struct sockaddr_in my, his;
+
+	void parseNextCommand();
 };
 
 

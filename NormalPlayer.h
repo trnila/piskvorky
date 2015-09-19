@@ -10,6 +10,9 @@ class NormalPlayer: public Player {
 public:
     NormalPlayer(CellType cellType, int cellSize);
     void injectEvent(SDL_Event & evt);
+
+	virtual void process();
+
 private:
     int cellSize;
 };
